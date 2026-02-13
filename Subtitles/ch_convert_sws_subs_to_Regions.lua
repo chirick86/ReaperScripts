@@ -5,7 +5,7 @@
 --   + Initial release
 --   + Convert SWS S&M subtitles to full timeline regions
 --   + Fixed standalone script
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Convert SWS subtitles to regions

@@ -10,7 +10,7 @@
 --   + Smooth scrolling and current line magnification
 --   + Autostart SubOverlay when Prompter starts (optional)
 --   + Autostart Prompter with REAPER (optional)
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Prompter

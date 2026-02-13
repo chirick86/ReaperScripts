@@ -7,7 +7,7 @@
 --   + Supports SRT and ASS formats (multiple file selection)
 --   + Auto-detects encoding (UTF-8, CP1251, CP866)
 --   + For ASS files with roles - creates separate track for each role
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Import text items from subtitles

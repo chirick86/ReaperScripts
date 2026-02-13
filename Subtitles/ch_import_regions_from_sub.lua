@@ -7,7 +7,7 @@
 --   + Supports SRT and ASS formats
 --   + Auto-detects encoding (UTF-8, CP1251, CP866)
 --   + For ASS files with roles - assigns unique color to each role
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Import regions from subtitles

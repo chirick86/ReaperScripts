@@ -10,7 +10,7 @@
 --   + Progress bar for current region/item
 --   + Smart line wrapping, vertical and horizontal alignment
 --   + Autostart with Prompter
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # SubOverlay

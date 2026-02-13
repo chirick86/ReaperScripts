@@ -5,7 +5,7 @@
 --   + Initial release
 --   + Export project regions to SRT file
 --   + Creates standard SRT file with timecodes
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Export regions to SRT

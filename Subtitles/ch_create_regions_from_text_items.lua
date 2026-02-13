@@ -4,7 +4,7 @@
 -- @changelog
 --   + Initial release
 --   + Convert text items to project regions
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Create regions from text items

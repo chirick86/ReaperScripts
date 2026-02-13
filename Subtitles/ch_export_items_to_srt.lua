@@ -5,7 +5,7 @@
 --   + Initial release
 --   + Export text items from selected track to SRT file
 --   + Creates standard SRT file with timecodes
--- @link https://github.com/chirick/reaperscripts
+-- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
 --   # Export items to SRT
