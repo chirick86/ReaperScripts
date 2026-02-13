@@ -1,15 +1,18 @@
 -- @description Hello world
 -- @author Chirick
--- @version 1.0.0
+-- @version 1.0.1
 -- @changelog
---   + Initial release
---   + test script to verify REAPER API access and console output
---   + Added metadata and description for testing purposes
+--   + added ko-fi link
+--   + added provides section
+-- @provides
+--   icons_fonts_readme/*.png
 -- @links
 --   Forum Thread       http://forum.cockos.com/showthread.php?t=169127
 --   Github repository  https://github.com/chirick86/reaperscripts
 --   Reddit thread      https://www.reddit.com/r/Reaper/
--- @donation https://patreon.com/chirick
+-- @donation
+--   https://patreon.com/chirick
+--   https://ko-fi.com/chirick
 -- @about
 --   # Hello world script
 --   
