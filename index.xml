@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="deb9ed0478567536aa18ace0d6c6c678740feadf">
+<index version="1" name="chirick" commit="b1cec78d944dc6c36c12d1da5953cd394ed6d82d">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -199,14 +199,18 @@
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_regions_to_srt.lua</source>
       </version>
     </reapack>
-    <reapack name="ch_hello_world.lua" type="script" desc="Hello world">
+    <reapack name="ch_icons_fonts.lua" type="script" desc="Icons and fonts">
       <metadata>
         <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Hello world script\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Test script to verify REAPER API access and console output\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 This script provides icons and fonts for Subtitle scripts.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 To use:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Install the script.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Copy the icons in Data\\toolbar_icons Reaper's resource path (Options > Show REAPER resource path in explorer/finder).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Install the fonts by double-clicking on them and clicking "Install" in the font viewer.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Restart Reaper if it was open during installation.\sa180\par}
 }
 ]]></description>
         <link rel="website" href="http://forum.cockos.com/showthread.php?t=169127">Forum Thread</link>
@@ -215,17 +219,20 @@
         <link rel="donation">https://patreon.com/chirick</link>
         <link rel="donation">https://ko-fi.com/chirick</link>
       </metadata>
-      <version name="1.0.2" author="Chirick" time="2026-02-13T23:41:26Z">
+      <version name="1.0.0" author="Chirick" time="2026-02-13T23:50:55Z">
         <changelog><![CDATA[+ added ko-fi link
 + added provides section]]></changelog>
-        <source main="main">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/Subtitles/ch_hello_world.lua</source>
-        <source file="../icons_fonts_readme/ch_Import_regions.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_Import_regions.png</source>
-        <source file="../icons_fonts_readme/ch_export_items.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_export_items.png</source>
-        <source file="../icons_fonts_readme/ch_export_regions.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_export_regions.png</source>
-        <source file="../icons_fonts_readme/ch_import_items.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_import_items.png</source>
-        <source file="../icons_fonts_readme/ch_items_to_regions.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_items_to_regions.png</source>
-        <source file="../icons_fonts_readme/ch_regions_to_items.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_regions_to_items.png</source>
-        <source file="../icons_fonts_readme/ch_suboverlay.png">https://github.com/chirick86/ReaperScripts/raw/deb9ed0478567536aa18ace0d6c6c678740feadf/icons_fonts_readme/ch_suboverlay.png</source>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/Subtitles/ch_icons_fonts.lua</source>
+        <source file="../icons_fonts_readme/CooperMediumCBT.otf">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/CooperMediumCBT.otf</source>
+        <source file="../icons_fonts_readme/Readme.ru.txt">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/Readme.ru.txt</source>
+        <source file="../icons_fonts_readme/Roboto-Regular.ttf">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/Roboto-Regular.ttf</source>
+        <source file="../icons_fonts_readme/ch_Import_regions.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_Import_regions.png</source>
+        <source file="../icons_fonts_readme/ch_export_items.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_export_items.png</source>
+        <source file="../icons_fonts_readme/ch_export_regions.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_export_regions.png</source>
+        <source file="../icons_fonts_readme/ch_import_items.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_import_items.png</source>
+        <source file="../icons_fonts_readme/ch_items_to_regions.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_items_to_regions.png</source>
+        <source file="../icons_fonts_readme/ch_regions_to_items.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_regions_to_items.png</source>
+        <source file="../icons_fonts_readme/ch_suboverlay.png">https://github.com/chirick86/ReaperScripts/raw/b1cec78d944dc6c36c12d1da5953cd394ed6d82d/icons_fonts_readme/ch_suboverlay.png</source>
       </version>
     </reapack>
     <reapack name="ch_import_regions_from_sub.lua" type="script" desc="Import regions from subtitles">
