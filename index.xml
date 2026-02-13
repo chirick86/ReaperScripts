@@ -1,3 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="54a27f99c8384e1144f26d2dbfd664184f05f1ec">
-</index>
+<index version="1" name="chirick" commit="9393595c56ff40881df6057af219acf1152ee779">
+<category name="ReaImGui"><reapack name="ch_prompter.lua" type="script" desc="Prompter"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Prompter\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Prompter for working with subtitles (regions/items) in REAPER\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Shows regions or text items as a scrollable list\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Automatically highlights current line based on playback position\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quick navigation by clicking on a line (+ copies text to clipboard)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Customizable fonts, colors and sizes for regions and items separately\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Search with highlighted results\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab "All elements" mode - combines regions and items in one timeline-sorted list\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smooth scrolling and current line magnification\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JS_ReaScript Extensions (install via ReaPack)\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Prompter for subtitles (regions/items) in REAPER
++ Automatically highlights current line based on playback position
++ Customizable fonts, colors and sizes
++ Search functionality with highlighted results
++ Smooth scrolling and current line magnification]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_prompter.lua</source></version></reapack><reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 SubOverlay\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Subtitle overlay over REAPER video window\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Shows text of current and next region/item during playback\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Can be attached to REAPER video window (automatically follows it)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Customizable fonts, colors, shadows for each line\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Progress bar shows current region/item progress\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smart line wrapping, vertical and horizontal alignment\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Transparent background, hide title bar - for minimalist display\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab "Fill gaps" mode - shows nearest text even between regions\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Subtitle overlay over REAPER video window
++ Shows current and next region/item text during playback
++ Can be attached to video window (automatically follows it)
++ Customizable fonts, colors, shadows
++ Progress bar for current region/item
++ Smart line wrapping, vertical and horizontal alignment]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_SubOverlay.lua</source></version></reapack></category><category name="Subtitles"><reapack name="ch_convert_sws_subs_to_Regions.lua" type="script" desc="Convert SWS subtitles to regions"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Convert SWS subtitles to regions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Convert SWS S&M subtitles to full timeline regions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Reads currently open (saved) project .rpp file\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Extracts <S&M_SUBTITLE blocks from  and maps them to marker indices\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Uses marker timing pairs (MARKER lines) to create regions with full subtitle text\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Deletes all existing timeline regions and recreates them with full texts\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Usage\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Save your project in REAPER, run this script from Actions \u8594 ? ReaScript\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Script will abort if the project is not saved\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Note:} Backup project before running!\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Convert SWS S&M subtitles to full timeline regions
++ Fixed standalone script]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_convert_sws_subs_to_Regions.lua</source></version></reapack><reapack name="ch_create_regions_from_text_items.lua" type="script" desc="Create regions from text items"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Create regions from text items\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Convert text items to project regions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Creates regions from all items on selected track\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Item Notes are transferred to region names\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Region timing matches items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Useful for converting track content to timeline marking\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Convert text items to project regions]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_regions_from_text_items.lua</source></version></reapack><reapack name="ch_create_text_items_from_regions.lua" type="script" desc="Create text items from regions"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Create text items from regions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Convert project regions to text items\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Creates new track with text items based on all project regions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Region names are transferred to item Notes\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Item timing matches regions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for transferring marking to tracks\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Convert project regions to text items on new track]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_text_items_from_regions.lua</source></version></reapack><reapack name="ch_export_items_to_srt.lua" type="script" desc="Export items to SRT"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Export items to SRT\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Export text items from selected track to SRT subtitle file\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Exports all items from selected track\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Creates standard SRT file with timecodes\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Text is taken from Notes of each item\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Suitable for transferring subtitles to other programs\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Export text items from selected track to SRT file
++ Creates standard SRT file with timecodes]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_items_to_srt.lua</source></version></reapack><reapack name="ch_export_regions_to_srt.lua" type="script" desc="Export regions to SRT"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Export regions to SRT\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Export project regions to SRT subtitle file\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Exports all project regions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Creates standard SRT file with timecodes\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Region names become subtitle text\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quick way to create subtitles from project marking\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Export project regions to SRT file
++ Creates standard SRT file with timecodes]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_regions_to_srt.lua</source></version></reapack><reapack name="ch_import_regions_from_sub.lua" type="script" desc="Import regions from subtitles"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Import regions from subtitles\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Import SRT/ASS subtitles as project regions in REAPER\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Supports SRT and ASS formats\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Auto-detects encoding (UTF-8, CP1251, CP866)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab For ASS files with roles - assigns unique color to each role (20 bright colors)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Regions are created with subtitle text as names and precise timecode\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for quick project marking by subtitles\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Import subtitles to regions
++ Supports SRT and ASS formats
++ Auto-detects encoding (UTF-8, CP1251, CP866)
++ For ASS files with roles - assigns unique color to each role]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_regions_from_sub.lua</source></version></reapack><reapack name="ch_import_text_items_from_sub.lua" type="script" desc="Import text items from subtitles"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Import text items from subtitles\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Import SRT/ASS subtitles as text items in REAPER\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Supports SRT and ASS formats (multiple file selection)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Auto-detects encoding (UTF-8, CP1251, CP866)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab For ASS files with roles - creates separate track for each role\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tracks are named by filename (or "filename - role" for ASS with roles)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Items are created with precise timecode and text in Notes\sa180\par}
+}
+]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
++ Import subtitles to text items
++ Supports SRT and ASS formats (multiple file selection)
++ Auto-detects encoding (UTF-8, CP1251, CP866)
++ For ASS files with roles - creates separate track for each role]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_text_items_from_sub.lua</source></version></reapack></category><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Chirick Subtitle Scripts\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 A comprehensive collection of scripts for working with subtitles in REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\cf1 [image: https://img.shields.io/badge/REAPER-6.0+-blue?style=flat-square]\cf0} {\field{\*\fldinst{HYPERLINK "LICENSE"}}{\fldrslt{\ul
+{\cf1 [image: https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square]\cf0}
+}}}
+ {\field{\*\fldinst{HYPERLINK "https://patreon.com/chirick"}}{\fldrslt{\ul
+{\cf1 [image: https://img.shields.io/badge/Support-Patreon-orange?style=flat-square]\cf0}
+}}}
+ {\field{\*\fldinst{HYPERLINK "https://ko-fi.com/chirick"}}{\fldrslt{\ul
+{\cf1 [image: https://img.shields.io/badge/Support-Ko--fi-red?style=flat-square]\cf0}
+}}}
+\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56550 ? Packages\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This repository contains two package categories:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 \u55356 ?\u57260 ? Subtitle Scripts\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Core subtitle tools for import, export, and conversion operations. No additional dependencies required.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import text items from subtitles} - Import SRT/ASS subtitles as text items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import regions from subtitles} - Import SRT/ASS subtitles as project regions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Export items to SRT} - Export text items from selected track to SRT file\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Export regions to SRT} - Export project regions to SRT file\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Create text items from regions} - Convert project regions to text items on new track\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Create regions from text items} - Convert text items on selected track to project regions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Convert SWS subtitles to regions} - Convert SWS S&M subtitles to full timeline regions\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 \u55357 ?\u56741 ?\u65039 ? Subtitle ReaImGui Scripts {\i (Advanced GUI tools)}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Real-time subtitle tools with graphical interface.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Prompter} - Prompter with automatic synchronization\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b SubOverlay} - Subtitle overlay over REAPER video window\sa180\par}
+{\pard \ql \f0 \sa180 \li720 \fi0 \u9888 ?\u65039 ? Requires {\field{\*\fldinst{HYPERLINK "https://github.com/cfillion/reaimgui"}}{\fldrslt{\ul
+ReaImGui
+}}}
+ (install via ReaPack)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u9889 ? Quick Start\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Installation via ReaPack (Recommended)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Install {\field{\*\fldinst{HYPERLINK "https://reapack.com/"}}{\fldrslt{\ul
+ReaPack
+}}}
+ if you haven't already\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab In REAPER: {\b Extensions} \u8594 ? {\b ReaPack} \u8594 ? {\b Import repositories...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Paste this URL and click OK:\par}
+{\pard \ql \f0 \sa180 \li360 \fi0 \f1 https://github.com/chirick86/ReaperScripts/raw/master/index.xml\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Go to {\b Extensions} \u8594 ? {\b ReaPack} \u8594 ? {\b Browse packages}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab Search for "Chirick" and install the packages you need\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Manual Installation\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Download last realese from the [Releases]\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Copy the {\f1 chirick} folder to your REAPER Scripts folder:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b Windows:} {\f1 %APPDATA%\\REAPER\\Scripts\\}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b macOS:} {\f1 ~/Library/Application Support/REAPER/Scripts/}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b Linux:} {\f1 ~/.config/REAPER/Scripts/}\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab In REAPER: {\b Actions} \u8594 ? {\b Show action list} \u8594 ? {\b New action} \u8594 ? {\b Load ReaScript...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Navigate to the {\f1 Subtitles} folder and select the scripts you want to use\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u57263 ? Typical Usage Scenario\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\b Import:} Use "Import text items from subtitles" to import an SRT/ASS file\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab {\b Display:} Open "Prompter" for comfortable reading during recording\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab {\b Overlay:} Run "SubOverlay" to display text over video in real-time\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u10024 ? Key Features\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Import & Export\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u9989 ? {\b Multiple encodings support} \u8211- UTF-8, CP1251, CP866\line \u9989 ? {\b ASS format support} \u8211- Automatic role separation with unique colors\line \u9989 ? {\b Batch processing} \u8211- Multiple file import with format auto-detection\line \u9989 ? {\b Instant import} \u8211- No waiting while items are being placed\line \u9989 ? {\b Flexible handling} \u8211- Empty lines allowed, lines can start with numbers\line \u9989 ? {\b First region preserved} \u8211- First region line doesn't disappear\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Display & Visualization\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u9989 ? {\b Special characters} \u8211- Accents and special symbols display correctly\line \u9989 ? {\b Flexible display modes} \u8211- Switch between regions, items, or combined view\line \u9989 ? {\b Smart filtering} \u8211- Muted tracks automatically excluded from Prompter\line \u9989 ? {\b Project memory} \u8211- Prompter remembers selected display mode for each project\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Advanced GUI Features (ReaImGui)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u9989 ? {\b Full customization} \u8211- Fonts, colors, sizes for each element\line \u9989 ? {\b Video window attachment} \u8211- SubOverlay follows REAPER video window\line \u9989 ? {\b Responsive overlay} \u8211- Automatically hides when REAPER is inactive or minimized\line \u9989 ? {\b Multi-track support} \u8211- Flexible track switching and display options\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56523 ? Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b REAPER} 6.0 or later\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b ReaPack} (for installation and auto-updates)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b ReaImGui} (for Prompter and SubOverlay \u8211- install via ReaPack)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b JS_ReaScript Extensions} (for Prompter \u8211- install via ReaPack)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Scripts Structure\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Export Scripts\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Export items to SRT} - Export text items from selected track to SRT file\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Text is taken from item Notes\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Standard SRT format with timecodes\sa180\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Export regions to SRT} - Export project regions to SRT file\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Region names become subtitle text\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Quick way to create subtitles from project marking\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Conversion Scripts\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Create text items from regions} - Convert project regions to text items\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Creates new track automatically\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Region names transferred to item Notes\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Timing matches perfectly\sa180\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Create regions from text items} - Convert text items to project regions\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Select a track with items\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Item Notes transferred to region names\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Useful for timeline marking\sa180\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Convert SWS subtitles to regions} - Convert SWS S&M subtitles to full timeline regions\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Reads currently open (saved) project .rpp file\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Extracts subtitle data and creates full regions\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b Note:} Backup project before running!\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 Subtitle ReaImGui Scripts\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Advanced GUI tools for working with subtitles. {\b Requires ReaImGui} (install via ReaPack).\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Install ReaImGui\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\b Extensions} \u8594 ? {\b ReaPack} \u8594 ? {\b Browse packages}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Search for "ReaImGui"\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Right-click on {\b ReaImGui: ReaScript binding for Dear ImGui}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Click {\b Install} \u8594 ? {\b Apply}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Scripts\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b Prompter} - Prompter for subtitles\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Shows regions or text items as scrollable list\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Automatically highlights current line during playback\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Click on line to jump to position (+ copies text to clipboard)\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Customizable fonts, colors, and sizes for regions and items separately\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Search with highlighted results\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab "All elements" mode - combines regions and items in timeline order\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Smooth scrolling and current line magnification\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Muted track items are excluded from display\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Remembers selected display mode for each project\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b Requires:} ReaImGui + JS_ReaScript Extensions\sa180\par}
+{\pard \ql \f0 \sa180 \li360 \fi-360 \bullet \tx360\tab {\b SubOverlay} - Subtitle overlay over video\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Shows current and next region/item text during playback\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Can be attached to REAPER video window (automatically follows it)\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Customizable fonts, colors, shadows for each line\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Progress bar shows current region/item progress\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Smart line wrapping, vertical and horizontal alignment\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Transparent background, hide title bar for minimalist display\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab "Fill gaps" mode - shows nearest text even between regions\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Only visible when REAPER is active or maximized\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\b Requires:} ReaImGui\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Resources\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\f1 icons_fonts_readme} folder contains additional resources:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Toolbar icons for scripts\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Font recommendations\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Detailed documentation (Readme.txt)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To use toolbar icons:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Copy icons to {\f1 REAPER\\Data\\toolbar_icons} folder\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Add scripts to toolbar\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Right-click on toolbar button \u8594 ? Set button icon\sa180\par}
+}
+]]></description></metadata></index>
