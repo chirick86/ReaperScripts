@@ -29,62 +29,38 @@
 --   ## Requirements
 --   * ReaImGui (install via ReaPack)
 
---[[ 
-    Sub Overlay
-    Версия: 0.0.3
-
-    checklist:
-    ОСНОВНОЕ ОКНО
-        Ресайз, закрытие, сворачивание, перетаскивание
-        пин окна
-    КОНТЕКСТНОЕ МЕНЮ
-        открытие, закрытие
-        переключение всех настроек
-        сохранение/загрузка настроек
-    ОТРИСОВКА
-        отрисовка обеих строк и прогрессбара
-        поведение при отсутствии регионов/итемов
-        отрисовка в начале и в конце проекта в обоих режимах
-
-    to do list: 
-        - Игнорировать offset при отключенном переносе строк
-        - Ограничить авторесайз при включенном автопереносе строк
-        - Исправить баг с постепенным изменением размера при авторесайзе и отключенном заголовке.
-        Должно меняться мгновенно как это работает с включенным заголовком.
-]]
-
 if not reaper.ImGui_CreateContext then
     reaper.ShowMessageBox("ReaImGui not found. Install ReaImGui.", "Error", 0)
     return
 end
 
--- Константы для ExtState управления
+-- Constants for ExtState control
 local CONTROL_SECTION = "ChirickSubOverlay_Control"
 local RUNNING_KEY = "running"
 local CLOSE_REQUEST_KEY = "close_request"
 local AUTOSTART_KEY = "autostart_on_prompter"
 
--- Считываем состояние
+-- Read state
 local close_req = reaper.GetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY)
 local already_running = reaper.GetExtState(CONTROL_SECTION, RUNNING_KEY)
 
 if close_req == "true" then
-    -- Получена команда на закрытие ЭТОГО экземпляра - очищаем всё и выходим
+    -- Received close command for THIS instance - clean up and exit
     reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
     reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
     return
 end
 
 if already_running == "true" then
-    -- Другой экземпляр уже запущен - отправляем команду на закрытие и выходим
+    -- Another instance already running - send close command and exit
     reaper.SetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, "true", false)
     return
 end
 
--- Устанавливаем флаг, что скрипт запущен
+-- Set flag that script is running
 reaper.SetExtState(CONTROL_SECTION, RUNNING_KEY, "true", false)
 
--- Регистрируем функцию очистки при завершении (вызывается при любом выходе)
+-- Register cleanup function on exit (called on any exit)
 reaper.atexit(function()
     reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
     reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
@@ -96,20 +72,20 @@ local win_X, win_Y, win_w, win_h = 500, 500, 500, 300
 local win_open = true
 local close_requested = false
 
--- Простой кэш для оптимизации
+-- Simple cache for optimization
 local last_pos = nil
 local cached_current, cached_next, cached_start, cached_stop = nil, nil, nil, nil
 
--- Кэш координат видеоокна
+-- Cache for video window coordinates
 local video_cache_valid = false
 local cached_video_x1, cached_video_y1, cached_video_x2, cached_video_y2 = nil, nil, nil, nil
 local cached_attach_x, cached_attach_y, cached_attach_w = nil, nil, nil
-local is_user_resizing = false          -- флаг для отслеживания ресайза пользователем
-local show_wrap_guides = false          -- флаг для отображения направляющих отступа переноса
+local is_user_resizing = false          -- flag to track user resize
+local show_wrap_guides = false          -- flag to show wrap guide lines
 
 
--- Настройки шрифта и масштаба
-local BASE_FONT_SIZE = 14               -- базовый размер шрифта для создания объектов
+-- Font and scale settings
+local BASE_FONT_SIZE = 14               -- base font size for creating font objects
 local available_fonts = {
     "Arial","Calibri","Roboto","Segoe UI","Tahoma","Verdana",
     "Cambria","CooperMediumC BT","Georgia","Times New Roman",
@@ -122,41 +98,41 @@ for i, name in ipairs(available_fonts) do
     reaper.ImGui_Attach(ctx, f)
 end
 
-local ui_font = font_objects[1]         -- первый шрифт всегда для UI
-local UI_FONT_SCALE = 14                -- фиксированный масштаб для интерфейса
-local CONTEXT_MENU_MIN_WIDTH = 100      -- минимальная ширина контекстного меню
-local next_region_offset = 20           -- отступ между текущим и следующим регионом
-local show_progress = true              -- показывать прогрессбар
-local progress_width = 400              -- ширина по умолчанию
-local progress_height = 4               -- высота по умолчанию
-local progress_offset = 20              -- отступ от первой строки
-local padding_x = 6                     -- отступы для фона под текстом
-local padding_y = 3                     -- отступы для фона под текстом
-local current_font_index = 1            -- индекс шрифта
-local font_scale = 30                   -- размер шрифта
-local text_color   = 0xFFBB00FF         -- цвет текста
-local shadow_color = 0x000000FF         -- цвет тени
-local second_font_index = 1             -- индекс шрифта для второй строки
-local second_font_scale = 22            -- размер второй строки
-local second_text_color = 0x99BB22FF    -- цвет второй строки
-local second_shadow_color = 0x000000FF  -- цвет тени второй строки
-local source_mode = nil                 -- 0 = регионы, >0 = номер трека с итемами
-local window_bg_color = 0x00000088      -- цвет подложки чёрный с прозрачностью
-local border = false                    -- рисовать фон под текстом
-local enable_wrap = true                -- переносить текст по словам
-local wrap_margin = 0                   -- отступ от края окна для автопереноса (пиксели)
-local enable_second_line = true         -- показывать вторую строку
-local align_center = true               -- выравнивание по центру (горизонтально, по умолчанию вкл.)
-local align_vertical = false            -- выравнивание по вертикали (центрирование контента в окне)
-local fill_gaps = true                  -- показывать ближайший регион/итем между объектами
-local show_tooltips = true              -- показывать подсказки
+local ui_font = font_objects[1]         -- first font always for UI
+local UI_FONT_SCALE = 14                -- fixed scale for interface
+local CONTEXT_MENU_MIN_WIDTH = 100      -- minimum context menu width
+local next_region_offset = 20           -- offset between current and next region
+local show_progress = true              -- show progress bar
+local progress_width = 400              -- default width
+local progress_height = 4               -- default height
+local progress_offset = 20              -- offset from first line
+local padding_x = 6                     -- padding for background under text
+local padding_y = 3                     -- padding for background under text
+local current_font_index = 1            -- font index
+local font_scale = 30                   -- font size
+local text_color   = 0xFFBB00FF         -- text color
+local shadow_color = 0x000000FF         -- shadow color
+local second_font_index = 1             -- font index for second line
+local second_font_scale = 22            -- second line size
+local second_text_color = 0x99BB22FF    -- second line color
+local second_shadow_color = 0x000000FF  -- second line shadow color
+local source_mode = nil                 -- 0 = regions, >0 = track number with items
+local window_bg_color = 0x00000088      -- background color black with transparency
+local border = false                    -- draw background under text
+local enable_wrap = true                -- wrap text by words
+local wrap_margin = 0                   -- offset from window edge for auto-wrap (pixels)
+local enable_second_line = true         -- show second line
+local align_center = true               -- center alignment (horizontal, default on)
+local align_vertical = false            -- vertical alignment (center content in window)
+local fill_gaps = true                  -- show nearest region/item between objects
+local show_tooltips = true              -- show tooltips
 local tooltip_delay = 0.5
 local tooltip_state = {}
-local attach_to_video = false           -- привязывать к видеоокну
-local attach_bottom = false             -- режим привязки: "bottom"
-local attach_offset = 0                 -- отступ в процентах (0-100)
-local ignore_newlines = false           -- игнорировать символы переноса строки при чтении
-local autostart_on_prompter = false     -- автозапуск при старте Prompter
+local attach_to_video = false           -- attach to video window
+local attach_bottom = false             -- attach mode: "bottom"
+local attach_offset = 0                 -- offset in percents (0-100)
+local ignore_newlines = false           -- ignore line break characters when reading
+local autostart_on_prompter = false     -- autostart when Prompter starts
 
 
 
@@ -169,9 +145,9 @@ local flags = {
     NoMove = false
 }
 
--- ==========================
--- СИСТЕМА ПЕРЕВОДОВ (i18n)
--- ==========================
+-- ========================
+-- TRANSLATE SECTION (i18n)
+-- ========================
 local languages = {"EN", "DE", "FR", "RU", "UK"}
 local lang = "EN"
 local str = {}
@@ -455,13 +431,13 @@ local i18n = {
         c_color2 = "цвет 2",
         c_shadow2 = "тень 2",
         -- Язык
-        c_language = "Язык",
-        t_language = "Нажмите для выбора языка интерфейса",
-        -- Автозапуск
-        c_autostart = "Автозапуск с Prompter",
-        t_autostart = "Автоматически запускать SubOverlay при старте Prompter",
-        -- Кнопки
-        b_close = "Закрыть окно"
+        c_language = "Language",
+        t_language = "Click to select interface language",
+        -- Autostart
+        c_autostart = "Autostart with Prompter",
+        t_autostart = "Automatically launch SubOverlay at Prompter startup",
+        -- Buttons
+        b_close = "Close window"
     },
     UK = {
         err_reaimgui = "ReaImGui не знайдено. Встановіть ReaImGui.",
@@ -525,10 +501,10 @@ local i18n = {
         c_color2 = "колір 2",
         c_shadow2 = "тінь 2",
         -- Мова
-        c_language = "Мова",
-        t_language = "Натисніть, щоб вибрати мову інтерфейсу",
-        -- Автозапуск
-        c_autostart = "Автозапуск з Prompter",
+        c_language = "Language",
+        t_language = "Click to select interface language",
+        -- Autostart
+        c_autostart = "Autostart with Prompter",
         t_autostart = "Автоматично запускати SubOverlay при старті Prompter",
         -- Кнопки
         b_close = "Закрити вікно"
@@ -536,11 +512,11 @@ local i18n = {
 }
 
 
--- ==========================
--- БЛОК ФУНКЦИЙ
--- ==========================
+-- ===============
+-- FUNCTIONS BLOCK
+-- ===============
 
--- Функция загрузки строк текущего языка
+-- Function to load strings of the current language
 local function load_language_strings(lang_code)
     local trans = i18n[lang_code] or i18n["EN"]
     str.err_reaimgui = trans.err_reaimgui
@@ -610,7 +586,7 @@ local function load_language_strings(lang_code)
     str.b_close = trans.b_close
 end
 
--- Сохраняем/загружаем настройки
+-- Save/load settings
 local SETTINGS_SECTION = "ChirickSubOverlay"
 
 local function save_settings()
@@ -647,14 +623,14 @@ local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "attach_offset", tostring(attach_offset), true)
     reaper.SetExtState(SETTINGS_SECTION, "ignore_newlines", tostring(ignore_newlines), true)
     reaper.SetExtState(SETTINGS_SECTION, "lang", lang, true)
-    -- Сохраняем autostart в общую секцию CONTROL_SECTION для доступа из Prompter
+    -- Store autostart in common CONTROL_SECTION for access from Prompter
     reaper.SetExtState(CONTROL_SECTION, AUTOSTART_KEY, tostring(autostart_on_prompter), true)
-    -- Сохраняем высоту только если включена привязка к видеоокну
+    -- Store window height only if video attachment is enabled
     if attach_to_video then
         reaper.SetExtState(SETTINGS_SECTION, "win_h", tostring(win_h), true)
     end
     
-    -- Инвалидируем кэш координат при сохранении настроек
+    -- Invalidate cache coordinates on settings save
     video_cache_valid = false
 end
 
@@ -698,10 +674,10 @@ local function load_settings()
     ignore_newlines = (reaper.GetExtState(SETTINGS_SECTION, "ignore_newlines") == "true")
     lang = reaper.GetExtState(SETTINGS_SECTION, "lang") or lang
     load_language_strings(lang)
-    -- Загружаем autostart из общей секции CONTROL_SECTION
+    -- Load autostart from common CONTROL_SECTION
     local autostart_str = reaper.GetExtState(CONTROL_SECTION, AUTOSTART_KEY)
     autostart_on_prompter = (autostart_str == "true")
-    -- Загружаем высоту только если включена привязка к видеоокну
+    -- Load window height only if video attachment is enabled
     if attach_to_video then
         win_h = tonumber(reaper.GetExtState(SETTINGS_SECTION, "win_h")) or 300
     end
@@ -709,17 +685,17 @@ end
 
 load_settings()
 
--- Функция сбора списка источников
+-- Function to collect list of sources
 local function collect_source_modes()
     local modes = {}
 
-    -- сначала проверяем наличие регионов
+    -- First check for regions
     local _, num_markers, num_regions = reaper.CountProjectMarkers(0)
     if num_regions > 0 then
         table.insert(modes, { id = 0, label = str.m_regions })
     end
 
-    -- пробегаем все треки и ищем итемы с текстом
+    -- Loop through all tracks and search for items with text
     local track_count = reaper.CountTracks(0)
     for t = 0, track_count-1 do
         local tr = reaper.GetTrack(0, t)
@@ -747,7 +723,7 @@ local function collect_source_modes()
     return modes
 end
 
--- убедиться, что выбранный source_mode реально доступен
+-- Ensure that selected source_mode is really available
 local function ensure_valid_source_mode()
     local modes = collect_source_modes()
     local valid = false
@@ -761,36 +737,36 @@ local function ensure_valid_source_mode()
         if #modes > 0 then
             source_mode = modes[1].id
         else
-            source_mode = 0 -- fallback: ничего нет
+            source_mode = 0 -- fallback: nothing available
         end
     end
 end
 ensure_valid_source_mode()
 
--- функция отображения подсказки
+-- Function to display tooltip
 local function tooltip(text)
-    if not show_tooltips then return end  -- глобальное отключение
+    if not show_tooltips then return end  -- global disable
 
     if reaper.ImGui_IsItemHovered(ctx) then
         local now = reaper.time_precise()
         local state = tooltip_state[text]
 
         if not state then
-            -- первый раз навели на этот элемент
+            -- first time hovering over this element
             tooltip_state[text] = { start = now }
         else
-            -- проверяем глобальную задержку
+            -- check global delay
             if now - state.start >= tooltip_delay then
                 reaper.ImGui_SetTooltip(ctx, text)
             end
         end
     else
-        -- сброс, когда уводим мышь
+        -- reset when mouse is away
         tooltip_state[text] = nil
     end
 end
 
--- Контекстное меню
+-- Context menu
 local function draw_context_menu()
     if reaper.ImGui_BeginPopup(ctx, "context_menu",
         reaper.ImGui_WindowFlags_NoResize() | reaper.ImGui_WindowFlags_NoSavedSettings()) then
@@ -802,12 +778,12 @@ local function draw_context_menu()
             return new_value
         end
 
-        -- Режим источника
+        -- Source mode
         local label = (source_mode == 0) and str.m_regions
                     or string.format(str.m_items, source_mode, source_mode)
 
         if reaper.ImGui_BeginCombo(ctx, str.m_mode, label) then
-            local modes = collect_source_modes() -- <== вот тут собираем список
+            local modes = collect_source_modes() -- collect list here
             for _, mode in ipairs(modes) do
                 if reaper.ImGui_Selectable(ctx, mode.label, source_mode == mode.id) then
                     source_mode = mode.id
@@ -817,7 +793,7 @@ local function draw_context_menu()
         end
         tooltip(str.t_mode)
         
-        -- Кнопка смены языка (на той же линии)
+        -- Language selection button (on the same line)
         reaper.ImGui_SameLine(ctx, 0, 10)
         if reaper.ImGui_Button(ctx, lang) then
             reaper.ImGui_OpenPopup(ctx, "lang_popup")
@@ -836,7 +812,7 @@ local function draw_context_menu()
             reaper.ImGui_EndPopup(ctx)
         end
 
-        -- Флаги окна
+        -- Window flags
         reaper.ImGui_Separator(ctx)
         flags.NoMove          = add_change(reaper.ImGui_Checkbox(ctx, str.c_pin, flags.NoMove))
         tooltip(str.t_pin)
@@ -857,7 +833,7 @@ local function draw_context_menu()
         if enable_wrap then
             wrap_margin       = add_change(reaper.ImGui_SliderInt(ctx, str.c_wrap_margin, wrap_margin, 0, 300))
             tooltip(str.t_wrap_margin)
-            -- Показываем направляющие если слайдер активен или на него наведена мышь
+            -- Show guides if slider is active or mouse hovers over it
             show_wrap_guides = reaper.ImGui_IsItemActive(ctx) or reaper.ImGui_IsItemHovered(ctx)
         else
             show_wrap_guides = false
@@ -866,7 +842,7 @@ local function draw_context_menu()
         ignore_newlines       = add_change(reaper.ImGui_Checkbox(ctx, str.c_ignore_nl, ignore_newlines))
         tooltip(str.t_ignore_nl)
         if old_ignore_newlines ~= ignore_newlines then
-            last_pos = nil -- Сбрасываем кэш при изменении опции
+            last_pos = nil -- Reset cache when option changes
         end
         fill_gaps             = add_change(reaper.ImGui_Checkbox(ctx, str.c_fill_gaps, fill_gaps))
         tooltip(str.t_fill_gaps)
@@ -876,19 +852,19 @@ local function draw_context_menu()
         tooltip(str.t_auto_resize)
         attach_to_video       = add_change(reaper.ImGui_Checkbox(ctx, str.c_attach_video, attach_to_video))
         tooltip(str.t_attach_video)
-        -- Дополнительные настройки привязки (показываем только если attach_to_video = true)
+        -- Additional attachment settings (show only if attach_to_video = true)
         if attach_to_video then
-            -- Чекбокс режима привязки
+            -- Checkbox for attachment mode
             attach_bottom = add_change(reaper.ImGui_Checkbox(ctx, str.c_attach_bottom, attach_bottom))
             tooltip(str.t_attach_bottom)
             
-            -- Слайдер отступа
+            -- Offset slider
             attach_offset = add_change(reaper.ImGui_SliderInt(ctx, str.c_attach_offset, attach_offset, 0, 100))
             tooltip(str.t_attach_offset)
         end
         
         
-        -- Стиль первой строки
+        -- First line styling
         reaper.ImGui_Separator(ctx)
         reaper.ImGui_Text(ctx, str.h_first_line)
         if reaper.ImGui_BeginCombo(ctx, str.c_font, available_fonts[current_font_index]) then
@@ -904,7 +880,7 @@ local function draw_context_menu()
         text_color      = add_change(reaper.ImGui_ColorEdit4(ctx, str.c_color, text_color, reaper.ImGui_ColorEditFlags_NoInputs() | reaper.ImGui_ColorEditFlags_AlphaBar()))
         shadow_color    = add_change(reaper.ImGui_ColorEdit4(ctx, str.c_shadow, shadow_color, reaper.ImGui_ColorEditFlags_NoInputs() | reaper.ImGui_ColorEditFlags_AlphaBar()))
 
-        -- Прогрессивный бар
+        -- Progress bar
         reaper.ImGui_Separator(ctx)
         show_progress = add_change(reaper.ImGui_Checkbox(ctx, str.c_progress, show_progress))
         tooltip(str.t_progress)
@@ -914,7 +890,7 @@ local function draw_context_menu()
             progress_offset = add_change(reaper.ImGui_SliderInt(ctx, str.c_offset, progress_offset, 0, 200))
         end
         
-        -- Стиль второй строки
+        -- Second line styling
         reaper.ImGui_Separator(ctx)
         enable_second_line = add_change(reaper.ImGui_Checkbox(ctx, str.c_second_line, enable_second_line))
         tooltip(str.t_second_line)
@@ -942,10 +918,10 @@ local function draw_context_menu()
         show_tooltips   = add_change(reaper.ImGui_Checkbox(ctx, str.c_tooltips, show_tooltips))
         tooltip(str.t_tooltips)
 
-        -- Сохраняем настройки, если были изменения
+        -- Save settings if there were changes
         if changes > 0 then save_settings() end
 
-        -- кнопка закрытия
+        -- close button
         reaper.ImGui_Separator(ctx)
         if reaper.ImGui_Button(ctx, str.b_close) then
             close_requested = true
@@ -957,7 +933,7 @@ local function draw_context_menu()
     end
 end
 
--- Функция для сбалансированного переноса текста
+-- Function for balanced text wrapping
 local function balanced_wrap(ctx, text, max_w)
     local words = {}
     for word in string.gmatch(text, "%S+") do
@@ -965,13 +941,13 @@ local function balanced_wrap(ctx, text, max_w)
     end
     if #words <= 1 then return {text} end
 
-    -- если строка помещается целиком → без переноса
+    -- if line fits completely → no wrap
     local total_w = reaper.ImGui_CalcTextSize(ctx, text)
     if total_w <= max_w then
         return {text}
     end
 
-    -- ищем оптимальное место для разрыва
+    -- find optimal break point
     local best_diff = math.huge
     local best_idx = nil
     for i = 1, #words-1 do
@@ -980,7 +956,7 @@ local function balanced_wrap(ctx, text, max_w)
         local w_left = reaper.ImGui_CalcTextSize(ctx, left)
         local w_right = reaper.ImGui_CalcTextSize(ctx, right)
 
-        -- обе половины должны иметь шанс влезть
+        -- both halves should have a chance to fit
         if w_left <= max_w and w_right <= max_w * 1.5 then
             local diff = math.abs(w_left - w_right)
             if diff < best_diff then
@@ -991,7 +967,7 @@ local function balanced_wrap(ctx, text, max_w)
     end
 
     if not best_idx then
-        -- fallback: обычный wrap по max_w
+        -- fallback: regular wrap by max_w
         local lines, current = {}, ""
         for _, word in ipairs(words) do
             local test_line = (current == "") and word or (current .. " " .. word)
@@ -1007,20 +983,20 @@ local function balanced_wrap(ctx, text, max_w)
         return lines
     end
 
-    -- делим строку на две части
+    -- split line into two parts
     local left = table.concat(words, " ", 1, best_idx)
     local right = table.concat(words, " ", best_idx+1, #words)
 
-    -- рекурсивно обрабатываем обе части
+    -- recursively process both parts
     local left_lines = balanced_wrap(ctx, left, max_w)
     local right_lines = balanced_wrap(ctx, right, max_w)
 
-    -- объединяем
+    -- combine
     for i = 1, #right_lines do table.insert(left_lines, right_lines[i]) end
     return left_lines
 end
 
--- Функция отрисовки текста
+-- Function to draw centered text
 local function draw_centered_text(ctx, text, font_index, font_scale, text_color, shadow_color, win_w)
     local font_to_push = font_objects[font_index] or font_objects[1]
     reaper.ImGui_PushFont(ctx, font_to_push, font_scale)
@@ -1028,7 +1004,7 @@ local function draw_centered_text(ctx, text, font_index, font_scale, text_color,
     local lines = {}
     for line in string.gmatch(text .. "\n", "(.-)\n") do
         if enable_wrap and line ~= "" then
-            -- Учитываем отступы padding и wrap_margin с обеих сторон
+            -- Account for padding and wrap_margin on both sides
             local max_wrap_width = win_w - padding_x*2 - wrap_margin*2
             local wrapped = balanced_wrap(ctx, line, max_wrap_width)
             for _, l in ipairs(wrapped) do
@@ -1058,7 +1034,7 @@ local function draw_centered_text(ctx, text, font_index, font_scale, text_color,
         if align_center then
             cur_x = (win_w - max_w)/2 + (max_w - w)/2
         else
-            cur_x = wrap_margin  -- выравнивание влево с учетом отступа
+            cur_x = wrap_margin  -- Left alignment with offset
         end
 
         if line ~= "" then
@@ -1086,7 +1062,7 @@ local function draw_centered_text(ctx, text, font_index, font_scale, text_color,
     reaper.ImGui_PopFont(ctx)
 end
 
--- Получение текущего и следующего регионов
+-- Get current and next region names
 local function get_current_and_next_region_names()
     local play_state = reaper.GetPlayState()
     local pos = (play_state & 1) == 1 and reaper.GetPlayPosition() or reaper.GetCursorPosition()
@@ -1108,7 +1084,7 @@ local function get_current_and_next_region_names()
     local nearest_idx = nil
 
     for i, r in ipairs(regions) do
-        -- если внутри региона → он становится текущим
+        -- if inside region → it becomes current
         if pos >= r.start and pos < r.stop then
             current = r.name
             if regions[i+1] then
@@ -1117,7 +1093,7 @@ local function get_current_and_next_region_names()
             return current, nextreg, r.start, r.stop
         end
 
-        -- иначе ищем ближайший регион по старту/концу
+        -- otherwise find nearest region by start/end
         local dist = math.min(math.abs(pos - r.start), math.abs(pos - r.stop))
         if dist < nearest_dist then
             nearest_dist = dist
@@ -1125,7 +1101,7 @@ local function get_current_and_next_region_names()
         end
     end
 
-    -- если не внутри региона → ближайший становится текущим
+    -- if not inside region → nearest becomes current
     if fill_gaps and nearest_idx then
         current = regions[nearest_idx].name
         if regions[nearest_idx+1] then
@@ -1134,11 +1110,11 @@ local function get_current_and_next_region_names()
         return current, nextreg, regions[nearest_idx].start, regions[nearest_idx].stop
     end
 
-    -- fallback: регионов нет или fill_gaps выключен
+    -- fallback: no regions or fill_gaps is off
     return "", "", 0, 0
 end
 
--- Получение текущего и следующего текстового итема на заданном треке
+-- Get current and next text items on track
 local function get_text_item_name(item)
     local take = reaper.GetActiveTake(item)
     if take and reaper.ValidatePtr(take, "MediaItem_Take*") then
@@ -1151,7 +1127,8 @@ local function get_text_item_name(item)
     end
     return nil
 end
--- Вспомогательная функция для поиска следующего текстового итема
+
+-- Helper function to find next text item
 local function find_next_text_item(track, start_idx)
     local items = reaper.CountTrackMediaItems(track)
     for j = start_idx, items-1 do
@@ -1209,13 +1186,13 @@ local function get_current_and_next_items(track)
     return "", "", 0, 0
 end
 
--- Функция для получения координат видеоокна REAPER
+-- Function to get REAPER video window position
 local function get_video_window_pos()
     if not reaper.JS_Window_Find then
-        return nil, nil, nil, nil  -- js_ReaScriptAPI не установлен
+        return nil, nil, nil, nil  -- js_ReaScriptAPI is not installed
     end
     
-    -- Ищем видеоокно (Video Window)
+    -- Find Video Window
     local video_hwnd = reaper.JS_Window_Find("Video Window", true)
     
     if video_hwnd then
@@ -1228,46 +1205,46 @@ local function get_video_window_pos()
     return nil, nil, nil, nil
 end
 
--- Проверка изменения позиции видеоокна и пересчет координат привязки
+-- Check if video window position has changed
 local function check_video_window_moved()
-    -- Получаем текущие координаты видеоокна
+    -- Get current video window coordinates
     local x1, y1, x2, y2 = get_video_window_pos()
     
-    -- Если видеоокна нет - выходим
+    -- If no video window - exit
     if not x1 then
         video_cache_valid = false
         return false
     end
     
-    -- Проверяем, изменились ли координаты
+    -- Check if coordinates have changed
     if video_cache_valid and cached_video_x1 == x1 and cached_video_y1 == y1 and 
        cached_video_x2 == x2 and cached_video_y2 == y2 then
-        -- Координаты не изменились, используем кэш
+        -- Coordinates unchanged, use cache
         return true
     end
     
-    -- Координаты изменились или кэш невалиден - пересчитываем позиции
+    -- Coordinates changed or cache invalid - пересчитываем позиции
     local video_width = x2 - x1
     local video_height = y2 - y1
     
-    -- Окно растягивается по ширине видеоокна
+    -- Window stretches to video window width
     attach_x = x1
     attach_w = video_width
     
-    -- Рассчитываем Y позицию в зависимости от режима привязки
-    -- Ограничиваем offset, чтобы окно не выходило за границы видеоокна
+    -- Calculate Y position depending on attachment mode
+    -- Limit offset, чтобы окно не выходило за границы видеоокна
     local max_offset = math.max(0, video_height - win_h)
     local offset_pixels = math.min(attach_offset * video_height / 100, max_offset)
     
     if attach_bottom then
-        -- Привязка к низу: y2 - высота окна - offset
+        -- Attach to bottom: y2 - window height - offset
         attach_y = y2 - win_h - offset_pixels
     else
-        -- Привязка к верху: y1 + offset
+        -- Attach to top: y1 + offset
         attach_y = y1 + offset_pixels
     end
     
-    -- Сохраняем в кэш
+    -- Save to cache
     cached_video_x1, cached_video_y1, cached_video_x2, cached_video_y2 = x1, y1, x2, y2
     cached_attach_x, cached_attach_y, cached_attach_w = attach_x, attach_y, attach_w
     video_cache_valid = true
@@ -1334,7 +1311,7 @@ local function debug_window()
 end
 
 -- =========================
--- Остальной основной цикл
+-- Rest of main loop
 -- =========================
 local function loop()
     reaper.ImGui_PushFont(ctx, ui_font, UI_FONT_SCALE)
@@ -1352,11 +1329,11 @@ local function loop()
         reaper.ImGui_SetNextWindowBgAlpha(ctx, 0)
     end
 
-    -- Устанавливаем начальный размер и позицию окна (только при первом запуске)
+    -- Set initial window size and position (only on first run)
     reaper.ImGui_SetNextWindowSize(ctx, win_w, win_h, reaper.ImGui_Cond_FirstUseEver())
     reaper.ImGui_SetNextWindowPos(ctx, win_X, win_Y, reaper.ImGui_Cond_FirstUseEver())
     
-    -- Если включена привязка к видеоокну и пользователь НЕ изменяет размер - применяем позиции
+    -- If video window attachment is enabled and user is NOT resizing - apply positions
     if attach_to_video and not is_user_resizing and check_video_window_moved() then
         reaper.ImGui_SetNextWindowPos(ctx, attach_x, attach_y)
         reaper.ImGui_SetNextWindowSize(ctx, attach_w, win_h)
@@ -1367,22 +1344,22 @@ local function loop()
     if visible then
         local new_win_w, new_win_h = reaper.ImGui_GetWindowSize(ctx)
         
-        -- Проверяем, изменился ли размер окна
+        -- Check if window size has changed
         local size_changed = (new_win_w ~= win_w or new_win_h ~= win_h)
         
-        -- Определяем, изменяет ли пользователь размер окна (зажата левая кнопка мыши + размер меняется)
+        -- Determine if user is resizing the window (left button pressed + size changing)
         local mouse_down = reaper.ImGui_IsMouseDown(ctx, 0)
         
         if size_changed and mouse_down then
-            -- Пользователь изменяет размер окна
+            -- User is resizing the window
             is_user_resizing = true
         elseif not mouse_down then
-            -- Кнопка мыши отпущена - завершаем ресайз
+            -- Mouse button released - complete resize
             if is_user_resizing then
                 is_user_resizing = false
                 if attach_to_video then
-                    video_cache_valid = false -- Инвалидируем кэш для пересчета позиций
-                    save_settings() -- Сохраняем высоту окна для привязки к видео
+                    video_cache_valid = false -- Invalidate cache for recalculation
+                    save_settings() -- Save window height for video attachment
                 end
             end
         end
@@ -1390,21 +1367,21 @@ local function loop()
         if size_changed then
             win_w, win_h = new_win_w, new_win_h
             if attach_to_video and not is_user_resizing then
-                video_cache_valid = false -- Инвалидируем кэш при изменении размера
+                video_cache_valid = false -- Invalidate cache on size change
             end
         end
         
         ensure_valid_source_mode()
 
         
-        -- Определяем текущую позицию плейхеда/курсора
+        -- Determine current playhead/cursor position
         local play_state = reaper.GetPlayState()
         local pos = (play_state & 1) == 1 and reaper.GetPlayPosition() or reaper.GetCursorPosition()
         
-        -- Проверяем, нужно ли обновлять данные
+        -- Check if we need to update data
         local current, nextreg, start_pos, stop_pos
         if pos ~= last_pos then
-            -- Позиция изменилась - обновляем данные
+            -- Position changed - update data
             last_pos = pos
             if source_mode == 0 then
                 current, nextreg, start_pos, stop_pos = get_current_and_next_region_names()
@@ -1416,10 +1393,10 @@ local function loop()
                     current, nextreg, start_pos, stop_pos = "", "", 0, 0
                 end
             end
-            -- Сохраняем в кэш
+            -- Save to cache
             cached_current, cached_next, cached_start, cached_stop = current, nextreg, start_pos, stop_pos
         else
-            -- Позиция не изменилась - используем кэш
+            -- Position unchanged - use cache
             current, nextreg, start_pos, stop_pos = cached_current, cached_next, cached_start, cached_stop
         end
 
@@ -1431,24 +1408,24 @@ local function loop()
             end
         end
 
-        -- Вертикальное центрирование (если включено)
+        -- Vertical alignment (if enabled)
         if align_vertical then
-            -- Рассчитываем общую высоту контента
+            -- Calculate total content height
             local total_height = 0
             
-            -- Высота первой строки
+            -- First line height
             reaper.ImGui_PushFont(ctx, font_objects[current_font_index] or font_objects[1], font_scale)
             local calc_width = win_w - padding_x*2 - wrap_margin*2
             local _, first_line_height = reaper.ImGui_CalcTextSize(ctx, current or " ", 0, 0, false, calc_width)
             reaper.ImGui_PopFont(ctx)
             total_height = total_height + first_line_height
             
-            -- Высота прогресс-бара (если включен)
+            -- Progress bar height (if enabled)
             if show_progress then
                 total_height = total_height + progress_offset + progress_height
             end
             
-            -- Высота второй строки (если включена)
+            -- Second line height (if enabled)
             if enable_second_line then
                 reaper.ImGui_PushFont(ctx, font_objects[second_font_index] or font_objects[1], second_font_scale)
                 local _, second_line_height = reaper.ImGui_CalcTextSize(ctx, nextreg or " ", 0, 0, false, calc_width)
@@ -1456,15 +1433,15 @@ local function loop()
                 total_height = total_height + next_region_offset + second_line_height
             end
             
-            -- Устанавливаем начальную позицию Y для центрирования
+            -- Set initial Y position для центрирования
             local start_y = math.max(0, (win_h - total_height) / 2)
             reaper.ImGui_SetCursorPosY(ctx, start_y)
         end
         
-        -- отрисовка текста
-        draw_centered_text(ctx, current, current_font_index, font_scale, text_color, shadow_color, win_w) -- первая строка
+        -- draw text
+        draw_centered_text(ctx, current, current_font_index, font_scale, text_color, shadow_color, win_w) -- first line
 
-        -- прогресс-бар
+        -- progress bar
         if show_progress then
             local cur_y = reaper.ImGui_GetCursorPosY(ctx)
             reaper.ImGui_SetCursorPosY(ctx, cur_y + progress_offset)
@@ -1476,35 +1453,35 @@ local function loop()
                 reaper.ImGui_ProgressBar(ctx, progress, progress_width, progress_height, "")
                 reaper.ImGui_PopStyleVar(ctx)
             else
-                -- если бар "невидимый" (между регионами/итемами)
+                -- if bar is "invisible" (between regions/items)
                 reaper.ImGui_Dummy(ctx, progress_width, progress_height)
             end
         end
 
-        if enable_second_line then -- проверка на включение второй строки
+        if enable_second_line then -- check if second line is enabled
             local cur_y = reaper.ImGui_GetCursorPosY(ctx)
-            reaper.ImGui_SetCursorPosY(ctx, cur_y + next_region_offset) -- отступ до второй строки
-            draw_centered_text(ctx, nextreg, second_font_index, second_font_scale, second_text_color, second_shadow_color, win_w) -- вторая строка
+            reaper.ImGui_SetCursorPosY(ctx, cur_y + next_region_offset) -- offset to second line
+            draw_centered_text(ctx, nextreg, second_font_index, second_font_scale, second_text_color, second_shadow_color, win_w) -- second line
         end
 
 
         
         win_X, win_Y = reaper.ImGui_GetWindowPos(ctx)
         local hovered = reaper.ImGui_IsWindowHovered(ctx)
-        -- Кнопка закрытия в правом верхнем углу
+        -- Close button in top right corner
         if flags.NoTitle then
             local button_size = 20
             local button_x = win_w - button_size - 10
             local button_y = 10
             reaper.ImGui_SetCursorPos(ctx, button_x, button_y)
-            -- Прозрачная кнопка с крестиком
-            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Button(), 0x00000000)  -- прозрачная
-            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_ButtonHovered(), 0xFF000088)  -- красноватая при наведении
-            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_ButtonActive(), 0xFF0000FF)  -- красная при клике
+            -- Transparent button with X
+            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Button(), 0x00000000)  -- transparent
+            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_ButtonHovered(), 0xFF000088)  -- reddish on hover
+            reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_ButtonActive(), 0xFF0000FF)  -- red on click
             if reaper.ImGui_IsWindowHovered(ctx) then
-                reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), 0xFFFFFFFF)  -- белый при наведении
+                reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), 0xFFFFFFFF)  -- white on hover
             else
-                reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), 0xFFFFFF00)  -- полупрозрачный
+                reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), 0xFFFFFF00)  -- semi-transparent
             end
             if reaper.ImGui_Button(ctx, "✕##close", button_size, button_size) then
                 close_requested = true
@@ -1512,22 +1489,22 @@ local function loop()
             reaper.ImGui_PopStyleColor(ctx, 4)
         end
 
-        -- Открытие контекстного меню по правому клику
+        -- Open context menu on right-click
         if hovered and reaper.ImGui_IsMouseClicked(ctx, 1, false) then
             reaper.ImGui_SetNextWindowSize(ctx, 200, 0, reaper.ImGui_Cond_Appearing())
             reaper.ImGui_OpenPopup(ctx, "context_menu")
         end
 
-        -- Отрисовка направляющих линий для отступа переноса
+        -- Draw guide lines for wrap offset
         if show_wrap_guides and wrap_margin > 0 then
             local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
-            local guide_color = 0x00FFFFFF  -- яркий бирюзовый (cyan)
+            local guide_color = 0x00FFFFFF  -- bright cyan
             
-            -- Левая линия
+            -- Left line
             local left_x = win_X + wrap_margin
             reaper.ImGui_DrawList_AddLine(draw_list, left_x, win_Y, left_x, win_Y + win_h, guide_color, 1.0)
             
-            -- Правая линия
+            -- Right line
             local right_x = win_X + win_w - wrap_margin
             reaper.ImGui_DrawList_AddLine(draw_list, right_x, win_Y, right_x, win_Y + win_h, guide_color, 1.0)
         end
@@ -1543,7 +1520,7 @@ local function loop()
     reaper.ImGui_PopStyleVar(ctx)
     reaper.ImGui_PopFont(ctx)
     
-    -- Проверяем запрос на закрытие от внешнего источника (например, промптера)
+    -- Check for close request from external source (e.g., prompter)
     local external_close = reaper.GetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY)
     if external_close == "true" then
         close_requested = true
@@ -1554,7 +1531,7 @@ local function loop()
     if continue_running then
         reaper.defer(loop)
     else
-        -- Очищаем флаги при закрытии
+        -- Clear flags on close
         reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
         reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
         close_requested = false

@@ -29,47 +29,10 @@
 --   ## Requirements
 --   * ReaImGui (install via ReaPack)
 --   * JS_ReaScript Extensions (install via ReaPack)
-
---[[Prompter v0.0.5
-    Зависимости:
-        ReaImGui (через ReaPack → ReaTeam Extensions)
-        Проверено на ReaImGui 0.10.0.2
-        JS_ReaScript Extensions (через ReaPack → ReaTeam Extensions)
-        
-    ✅ Чеклист критически важных функций
-        [✅] Источники данных
-            [✅] Переключение между регионами и текстовыми итемами
-            [✅] Сохранение выбранного источника при смене проекта
-            [✅] Автообновление списков при изменении проекта
-            [✅] Корректное отображение имен источников (регионы, треки)
-        [✅] Синхронизация с проектом
-            [✅] Отслеживание позиции курсора/плейхеда
-            [✅] Подсветка текущей строки по времени
-            [✅] Автоскролл к активной строке
-            [✅] Переход к строке по клику
-        [✅] Настройки и персистентность
-            [✅] Сохранение настроек шрифтов и цветов
-            [✅] Сохранение выбранного источника для каждого проекта
-            [✅] Загрузка настроек при запуске и смене проекта
-            [✅] Восстановление состояния после перезапуска
-        [✅] UI и производительность
-            [✅] Плавный скролл (если включен)
-            [✅] Контекстное меню с настройками
-            [✅] Автоперенос длинных строк
-            [✅] Стабильная работа при частых обновлениях
-        [✅] Критические сценарии
-            [✅] Переключение между проектами с разными источниками
-            [✅] Закрытие/открытие проекта
-            [✅] Изменение количества треков/регионов в процессе работы
-            [✅] Работа с пустыми проектами (без регионов/итемов)
-        
-        
-    Другие скрипты:
-        importSUB - игнорирование форматирования]]
         
 
 if not reaper.ImGui_CreateContext then
-    reaper.ShowMessageBox("ReaImGui не найден. Установите через ReaPack.", "Ошибка", 0)
+    reaper.ShowMessageBox("ReaImGui not found. Install via ReaPack.", "Error", 0)
     return
 end
 
@@ -83,7 +46,7 @@ local proj_guid = tostring(proj_name .. tostring(proj_id):sub(-6))
 local languages = {"EN", "DE", "FR", "RU", "UK"}
 local lang = "EN"
 
--- Таблица для кэширования строк текущего языка
+-- Table for caching strings of the current language
 local str = {}
 
 local i18n = {
@@ -294,17 +257,17 @@ local i18n = {
     }
 }
 
--- время
+-- time
 local scroll_delay = 0.5
 local hovered_time = 0
 local target_scroll_y = nil
 local last_highlighted_idx = nil
 local last_scroll_source = nil
-local last_central_y = nil  -- для отслеживания изменения позиции
-local central_y = nil  -- позиция центрального элемента
+local last_central_y = nil  -- to track position changes
+local central_y = nil  -- position of central element
 local hours_enabled = false
 
--- кэширование
+-- caching
 local _, _, last_CountRegions = reaper.CountProjectMarkers(0)
 local cached_pos, cached_source_guid, cached_source_idx, cached_line_idx = nil, nil, nil, nil
 local last_text_items_count = 0
@@ -313,11 +276,11 @@ local last_ProjectStateChangeCount = 0
 local last_CountTracks = 0
 local last_BPM = reaper.Master_GetTempo()
 
--- UI состояние
+-- UI state
 local want_context_menu = false
 local window_hovered = false
 
--- размеры UI
+-- UI dimensions
 local ui_dimensions = {
     time_width = 0,
     space_width = 0,
@@ -325,20 +288,20 @@ local ui_dimensions = {
     win_height = 0
 }
 
--- данные проекта
+-- project data
 local cur_regions = {}
 local cur_items_by_track = {}
 local combo_sources = {}
 
--- индексы источников
-local source_idx = 1  -- индекс источника в списке combo_sources
-local source_guid = nil   -- уникальный идентификатор источника (например, "regions" или "items_<track_guid>")    
+-- source indices
+local source_idx = 1  -- index of the source in the combo_sources list
+local source_guid = nil   -- unique identifier of the source (e.g., "regions" or "items_<track_guid>")    
 
--- кэш для объединенного списка
-local combined_items_cache = nil  -- кэшированный объединенный список
-local combined_cache_valid = false  -- флаг валидности кэша    
+-- cache for combined list
+local combined_items_cache = nil  -- cached combined list
+local combined_cache_valid = false  -- cache validity flag    
 
--- ========= Шрифты =========
+-- ========= Fonts =========
 local font_names = {
     "Arial","Calibri","Roboto","Segoe UI","Tahoma","Verdana",
     "Cambria","CooperMediumC BT","Georgia","Times New Roman",
@@ -353,11 +316,11 @@ for i, name in ipairs(font_names) do
     reaper.ImGui_Attach(ctx, f)
 end
 
--- UI-шрифт (берём первый)
+-- UI font (take the first one by default, can be customized in settings)
 local ui_font   = fonts[1]
 local ui_scale  = 14
 
--- Настройки шрифтов для разных типов элементов
+-- Font settings for different types of elements
 local font_settings = {
     region = {
         idx = 1,
@@ -372,11 +335,11 @@ local font_settings = {
 }
 local central_scale = 1.2
 local central_scale_enabled = false
-local auto_wrap_enabled = true      -- автоперенос длинных строк
-local ignore_newlines   = false     -- замена \n на пробелы
-local autostart_on_reaper = false   -- автозапуск Prompter при старте REAPER
+local auto_wrap_enabled = true      -- auto-wrap long lines
+local ignore_newlines   = false     -- replace \n with spaces
+local autostart_on_reaper = false   -- auto-start Prompter on REAPER start
 
--- цвета
+-- colors (default values, can be customized in settings)
 local color_settings = {
     region = {
         normal = 0xFFFFFFFF,
@@ -388,89 +351,70 @@ local color_settings = {
     },
     search_highlight = 0xFF00FFFF
 }
-local search = ""  -- строка поиска
+local search = ""  -- search string
 
--- функции
+-- functions
 local smooth_scroll_enabled = false
 local scroll_speed = 0.05
 local auto_update_enabled = false
 
--- подсказки
+-- tooltips
 local show_tooltips    = true
 local tooltip_delay    = 0.5
-local tooltip_state    = {}  -- таблица состояний (по ключу текста подсказки)
+local tooltip_state    = {}  -- table of states (keyed by tooltip text)
 
 
--- � Управление автозапуском через __startup.lua
+-- 🚀 Управление автозапуском через __startup.lua
 local STARTUP_MARKER_BEGIN = "-- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK"
 local STARTUP_MARKER_END = "-- [CHIRICK_PROMPTER_AUTOSTART_END]"
 
--- Получаем command ID текущего скрипта
+-- get command ID of the current script
 local function get_script_command_id()
-    local _, _, sectionID, cmdID = reaper.get_action_context()
-    return sectionID, cmdID
+    local _, _, _, cmdID = reaper.get_action_context()
+    return cmdID
 end
 
 local function manage_startup_autostart(enable)
     local startup_path = reaper.GetResourcePath() .. "/Scripts/__startup.lua"
     
-    -- Читаем текущий содержимое файла
-    local file = io.open(startup_path, "r")
-    local content = ""
-    if file then
-        content = file:read("*all")
-        file:close()
-    end
-    
-    -- Ищем наш блок между маркерами
+    -- Read current content of __startup.lua or create if it doesn't exist
+    local file = io.open(startup_path, "w")
+    local content = file:read("*all") or ""
+
+    -- Look for our block between the markers
     local block_start = content:find(STARTUP_MARKER_BEGIN, 1, true)
     local block_end = content:find(STARTUP_MARKER_END, 1, true)
     
     if enable then
-        -- Получаем command ID скрипта
-        local sectionID, cmdID = get_script_command_id()
+        -- Get command ID of the script
+        local cmdID = get_script_command_id()
         
-        -- Добавляем блок если его нет
+        -- Add the block if it doesn't exist
         if not block_start and cmdID then
             local new_block = string.format([[
 
--- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK
-if reaper.GetExtState("Chirick Prompter", "autostart_on_reaper") == "true" then
-    reaper.Main_OnCommand(%d, 0)
-end
--- [CHIRICK_PROMPTER_AUTOSTART_END]
-]], cmdID)
-            content = content .. new_block
-            
-            -- Записываем обновленный файл
-            file = io.open(startup_path, "w")
-            if file then
-                file:write(content)
-                file:close()
-                return true
+            -- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK
+            if reaper.GetExtState("Chirick Prompter", "autostart_on_reaper") == "true" then
+                reaper.Main_OnCommand(%d, 0)
             end
+            -- [CHIRICK_PROMPTER_AUTOSTART_END]
+            ]], cmdID)
+            content = content .. new_block
         end
     else
-        -- Удаляем блок если он есть
+        -- Remove the block if it exists
         if block_start and block_end then
             local before = content:sub(1, block_start - 1)
             local after = content:sub(block_end + #STARTUP_MARKER_END)
             content = before .. after
-            
-            -- Записываем обновленный файл
-            file = io.open(startup_path, "w")
-            if file then
-                file:write(content)
-                file:close()
-                return true
-            end
         end
     end
-    
-    return false
+    file:write(content)
+    file:close()
+    return true
 end
 
--- �💾 Сохранение/загрузка настроек
+-- 💾 Save/load settings
 local function save_settings()
     reaper.SetExtState(SETTINGS, "region_font_idx",   tostring(font_settings.region.idx), true)
     reaper.SetExtState(SETTINGS, "region_scale", tostring(font_settings.region.scale), true)
@@ -493,7 +437,7 @@ local function save_settings()
     reaper.SetExtState(SETTINGS, "lang", lang, true)
     reaper.SetExtState(SETTINGS, "autostart_on_reaper", tostring(autostart_on_reaper), true)
 
-    -- Сохраняем выбранный источник в настройки проекта
+    -- Save the selected source to the project settings
     if combo_sources[source_idx] then
         reaper.SetProjExtState(0, SETTINGS, "source_guid", combo_sources[source_idx].guid)
     end
@@ -526,7 +470,7 @@ local function load_settings()
     font_settings.region.scale = math.max(10, math.min(100, read_num("region_scale", font_settings.region.scale)))
     font_settings.item.scale   = math.max(10, math.min(100, read_num("item_scale", font_settings.item.scale)))
     
-    -- Обновляем объекты шрифтов
+    -- Update font objects
     font_settings.region.font = fonts[font_settings.region.idx]
     font_settings.item.font = fonts[font_settings.item.idx]
     central_scale = math.max(1.0, math.min(2.5, read_num("central_scale", central_scale)))
@@ -547,21 +491,21 @@ local function load_settings()
     if stored_lang ~= "" then
         lang = stored_lang
     end
-    -- Загружаем выбранный источник из настроек проекта
+    -- Load the selected source from the project settings
     local retval, local_source_guid = reaper.GetProjExtState(0, SETTINGS, "source_guid")
     if retval then
         source_guid = local_source_guid
     end
     
-    -- Загружаем настройку автозапуска Prompter при старте REAPER
+    -- Load the setting for autostarting Prompter on REAPER startup
     autostart_on_reaper = read_bool("autostart_on_reaper", false)
     
-    -- Автозапуск SubOverlay если включен
+    -- Autostart SubOverlay if enabled
     local autostart_overlay = reaper.GetExtState("ChirickSubOverlay_Control", "autostart_on_prompter")
     if autostart_overlay == "true" then
         local overlay_is_running = reaper.GetExtState("ChirickSubOverlay_Control", "running") == "true"
         if not overlay_is_running then
-            -- Запускаем SubOverlay
+            -- Start SubOverlay
             local info = debug.getinfo(1, "S")
             local base = (info.source:match("@?(.*[\\/])") or "")
             local p = base .. "ch_SubOverlay.lua"
@@ -574,21 +518,21 @@ local function load_settings()
 end
 
 
--- 🔧 Утилиты низкого уровня
+-- 🔧 Low-level utilities
 local function utf8lower(str)
-    -- корректное понижение регистра (рус/лат)
+    -- Correct lowercase conversion (Russian/Latin)
     local map = {
-        -- русский
+        -- Russian
         ["А"]="а",["Б"]="б",["В"]="в",["Г"]="г",["Д"]="д",["Е"]="е",["Ё"]="е",
         ["Ж"]="ж",["З"]="з",["И"]="и",["Й"]="й",["К"]="к",["Л"]="л",["М"]="м",
         ["Н"]="н",["О"]="о",["П"]="п",["Р"]="р",["С"]="с",["Т"]="т",["У"]="у",
         ["Ф"]="ф",["Х"]="х",["Ц"]="ц",["Ч"]="ч",["Ш"]="ш",["Щ"]="щ",["Ъ"]="ъ",
         ["Ы"]="ы",["Ь"]="ь",["Э"]="э",["Ю"]="ю",["Я"]="я",
         
-        -- дополнительные замены для поиска
-        ["ё"]="е",  -- строчная ё тоже приводится к е
+        -- additional replacements for search
+        ["ё"]="е",  -- lowercase ё is also transliterated to е
 
-        -- украинский (добавлено)
+        -- Ukrainian (added)
         ["І"]="і",["I"]="і",["i"]="і", -- U+0406 → U+0456
         ["Ї"]="ї",
         ["Є"]="є",
@@ -619,11 +563,11 @@ local function calculate_time_width()
     if src and src.kind == "regions" then
         reaper.ImGui_PushFont(ctx, font_settings.region.font, font_settings.region.scale*sc)
     elseif src and src.kind == "combined" then
-        -- Для объединенного источника используем максимальный скейл между регионами и итемами
+        -- For combined source, use max scale between regions and items
         local max_scale = math.max(font_settings.region.scale, font_settings.item.scale) * sc
         reaper.ImGui_PushFont(ctx, font_settings.region.font, max_scale)
     else
-        -- По умолчанию используем стиль итемов
+        -- Default to items style
         reaper.ImGui_PushFont(ctx, font_settings.item.font, font_settings.item.scale*sc)
     end
     
@@ -632,11 +576,11 @@ local function calculate_time_width()
     else
         ui_dimensions.time_width = reaper.ImGui_CalcTextSize(ctx, "00:00")
     end
-    ui_dimensions.space_width = reaper.ImGui_CalcTextSize(ctx, " >  ") -- время, пробелы
+    ui_dimensions.space_width = reaper.ImGui_CalcTextSize(ctx, " >  ") -- time, spaces
     reaper.ImGui_PopFont(ctx)
 end
 
---  Загрузка всех строк для текущего языка (один раз при смене языка)
+-- 🔤 Load all strings for the current language (once when the language changes)
 local function load_language_strings(lang_code)
     local trans = i18n[lang_code] or i18n["EN"]
     str.i_import         = trans.i_import
@@ -675,10 +619,10 @@ local function load_language_strings(lang_code)
     str.c_search_highlight = trans.c_search_highlight
 end
 
--- 🔍 Функция поиска
+-- 🔍 Search function
 local function search_filter(items, search_query)
     if not search_query or search_query == "" then
-        return items  -- Если поиск пустой, возвращаем все элементы
+        return items  -- If the search is empty, return all items
     end
     
     local filtered = {}
@@ -687,14 +631,14 @@ local function search_filter(items, search_query)
     for _, item in ipairs(items) do
         local found = false
         
-        -- Ищем в основном тексте
+        -- Search in the main text
         local item_text = item.name or ""
         local item_lower = utf8lower(item_text)
         if string.find(item_lower, query_lower, 1, true) then
             found = true
         end
         
-        -- Ищем в названии трека (если есть)
+        -- Search in the track name (if available)
         if not found and item.track_name then
             local track_lower = utf8lower(item.track_name)
             if string.find(track_lower, query_lower, 1, true) then
@@ -711,7 +655,7 @@ local function search_filter(items, search_query)
 end
 
 
--- 📊 Работа с проектом
+-- 📊 Project work
 local function collect_regions()
     cur_regions = {}
 
@@ -746,10 +690,10 @@ local function collect_text_items()
         local _, track_name = reaper.GetTrackName(track)
         local track_guid = reaper.GetTrackGUID(track)
         
-        -- Проверяем, замьючен ли трек
+        -- Check if track is muted
         local is_muted = reaper.GetMediaTrackInfo_Value(track, "B_MUTE") == 1
         if is_muted then
-            -- будем помечать такой трек флагом
+            -- mark such track with flag
         end
 
         local items = {}
@@ -773,7 +717,7 @@ local function collect_text_items()
             end
         end
 
-        -- Добавляем трек в список только если есть текстовые итемы
+        -- Add track only if it has text items
         if #items > 0 then
             table.sort(items, function(a,b) return a.start_time < b.start_time end)
             
@@ -782,7 +726,7 @@ local function collect_text_items()
                 track_id   = track,
                 track_name = track_name,
                 items      = items,
-                is_muted   = is_muted  -- флаг замьюченого трека
+                is_muted   = is_muted  -- flag for muted track
             }
         end
         
@@ -797,17 +741,17 @@ local function create_combined_list()
     
     local combined = {}
     
-    -- Создаем маппинг источников к их порядку в комболисте
+    -- Create mapping of sources to their order in combo list
     local source_order = {}
     local order = 1
     
-    -- Регионы всегда первые
+    -- Regions are always first
     if #cur_regions > 0 then
         source_order["regions"] = order
         order = order + 1
     end
     
-    -- Затем треки в порядке их добавления
+    -- Then tracks in order of addition
     for _, track_data in ipairs(cur_items_by_track or {}) do
         if not track_data.is_muted then
             local track_guid = track_data.track_guid
@@ -816,7 +760,7 @@ local function create_combined_list()
         end
     end
     
-    -- Добавляем регионы
+    -- Add regions
     for _, region in ipairs(cur_regions or {}) do
         combined[#combined+1] = {
             start_time = region.start_time,
@@ -830,9 +774,9 @@ local function create_combined_list()
         }
     end
     
-    -- Добавляем итемы только с незамьюченых треков
+    -- Add items only from unmuted tracks
     for _, track_data in ipairs(cur_items_by_track or {}) do
-        -- Пропускаем замьюченые треки
+        -- Skip muted tracks
         if not track_data.is_muted then
             local track_guid = track_data.track_guid
             local track_order = source_order["items_" .. tostring(track_guid)] or 999
@@ -853,10 +797,10 @@ local function create_combined_list()
         end
     end
     
-    -- Сортируем по времени начала, при равном времени - по порядку источников в комболисте
+    -- Sort by start time, if equal - by source order in combo list
     table.sort(combined, function(a, b) 
         if a.start_time == b.start_time then
-            -- При равном времени используем порядок источников в комболисте
+            -- If times are equal, use source order from combo list
             return a.source_order < b.source_order
         else
             return a.start_time < b.start_time
@@ -877,7 +821,7 @@ end
 local function get_combo_list()
     combo_sources = {}
 
-    -- регионы
+    -- Regions
     if #cur_regions > 0 then
         combo_sources[#combo_sources+1] = {
             guid = "regions",
@@ -887,14 +831,14 @@ local function get_combo_list()
         }
     end
 
-    -- итемы по трекам (только незамьюченые треки с итемами)
+    -- Items by tracks (only unmuted tracks with items)
     for _, track_data in ipairs(cur_items_by_track) do
         local track_name = track_data.track_name
         local track_guid = track_data.track_guid
         local items_list = track_data.items
         local is_muted   = track_data.is_muted
 
-        -- Показываем в комболисте только незамьюченые треки
+        -- Show only unmuted tracks in combo list
         if not is_muted then
         local short_name = (#track_name > 9)
             and (string.sub(track_name, -9))
@@ -904,13 +848,13 @@ local function get_combo_list()
             guid  = "items_" .. tostring(track_guid),
             name  = short_name,
             kind  = "text_items",
-            track = track_name,  -- полное имя (для отладки)
+            track = track_name,  -- full name (for debugging)
             data  = items_list
         }
         end
     end
 
-    -- Объединенный источник (только если есть более одного источника)
+    -- Combined source (only if more than one source)
     if #combo_sources > 1 then
         local combined_data = create_combined_list()
         if #combined_data > 0 then
@@ -923,7 +867,7 @@ local function get_combo_list()
         end
     end
 
-    -- Восстанавливаем выбранный источник или устанавливаем первый доступный
+    -- Restore selected source or set first available
     if source_guid then
         local found = false
         for i, source in ipairs(combo_sources) do
@@ -951,32 +895,32 @@ end
 local function get_current_index(pos, source)
     if not source or not source.data or #source.data == 0 then return nil end
 
-    -- быстрый выход по кэшу
+    -- quick exit by cache
     if cached_pos and cached_source_guid == source.guid and math.abs(pos - cached_pos) < 1e-9 then
         return cached_line_idx
     end
 
     local data = source.data
-    local idx_list = {}  -- список всех центральных индексов
+    local idx_list = {}  -- list of all central indices
 
     if source.kind == "combined" then
-        -- Для объединенного списка собираем ВСЕ элементы, которые попадают под курсор/плейхед
+        -- For combined list, collect ALL elements that fall under cursor/playhead
         local elements_in_range = {}
         local closest_prev = nil
         local closest_prev_time = -math.huge
         
         for i = 1, #data do
             local r = data[i]
-            -- Проверяем, попадает ли текущая позиция в диапазон элемента
+            -- Check if current position is in element range
             if pos >= r.start_time and pos <= r.end_time then
                 elements_in_range[#elements_in_range + 1] = i
             elseif r.end_time < pos and r.end_time > closest_prev_time then
-                -- Ищем ближайшие предыдущие элементы
+                -- Find closest previous elements
                 if r.end_time == closest_prev_time then
-                    -- Элемент с таким же временем окончания - добавляем к списку
+                    -- Element with same end time - add to list
                     closest_prev[#closest_prev + 1] = i
                 else
-                    -- Нашли элемент ближе - начинаем новый список
+                    -- Found closer element - start new list
                     closest_prev_time = r.end_time
                     closest_prev = {i}
                 end
@@ -984,17 +928,17 @@ local function get_current_index(pos, source)
         end
         
         if #elements_in_range > 0 then
-            -- Есть элементы под плейхедом - используем их
+            -- Found elements under playhead - use them
             idx_list = elements_in_range
         elseif closest_prev then
-            -- Плейхед между элементами - берем все ближайшие предыдущие со всех источников
+            -- Playhead between elements - take all closest previous from all sources
             idx_list = closest_prev
         else
-            -- Ничего не нашли - берем первый элемент
+            -- Found nothing - take first element
             idx_list[1] = 1
         end
     else
-        -- Обычная логика для других источников - только один элемент
+        -- Regular logic for other sources - only one element
         local idx
         for i = 1, #data do
             if pos < data[i].start_time then
@@ -1035,18 +979,18 @@ local function project_changed()
 
     for _, track_data in ipairs(cur_items_by_track or {}) do
         local track_id = track_data.track_id
-        -- Проверяем, что трек еще существует
+        -- Check if the track still exists
         if track_id and reaper.ValidatePtr(track_id, "MediaTrack*") then
-            -- Проверяем изменение статуса mute
+            -- Check for mute status change
             local current_mute_status = reaper.GetMediaTrackInfo_Value(track_id, "B_MUTE") == 1
             local stored_mute_status = track_data.is_muted
             
-            -- Если статус mute изменился, это изменение проекта
+            -- If the mute status has changed, it's a project change
             if current_mute_status ~= stored_mute_status then
                 return true
             end
             
-            -- Считаем итемы только для незамьюченых треков
+            -- Count items only for unmuted tracks
             if not current_mute_status then
             text_items_count = text_items_count + reaper.CountTrackMediaItems(track_id)
             end
@@ -1061,7 +1005,7 @@ local function project_changed()
         return true
     end
     
-    -- Проверяем изменение BPM
+    -- Check for BPM change
     local current_BPM = reaper.Master_GetTempo()
     if current_BPM ~= last_BPM then
         last_BPM = current_BPM
@@ -1072,7 +1016,7 @@ local function project_changed()
 end
 
 
--- 🪟 UI-служебные функции
+-- 🪟 UI utility functions
 local function tooltip(text)
     if not show_tooltips then return end
     if reaper.ImGui_IsItemHovered(ctx) then
@@ -1082,7 +1026,7 @@ local function tooltip(text)
             tooltip_state[text] = { start = now }
         else
             if now - st.start >= tooltip_delay then
-                -- используют короткую форму для стабильности
+                -- use short form for stability
                 reaper.ImGui_SetTooltip(ctx, text)
             end
         end
@@ -1097,12 +1041,12 @@ local function smooth_scroll(target_scroll)
     target_scroll = math.max(0, math.min(target_scroll, scroll_max))
 
     if math.abs(scroll_y - target_scroll) > 0.5 then
-        -- Вычисляем адаптивную скорость на основе расстояния
+        -- Calculate adaptive speed based on distance
         local distance = math.abs(target_scroll - scroll_y)
         local half_h = ui_dimensions.win_height * 0.5
         local adaptive_speed = scroll_speed
         
-        -- Увеличиваем скорость кратно в зависимости от расстояния
+        -- Increase speed proportionally based on distance
         if ui_dimensions.win_height > 0 then
             if distance > half_h then
                 adaptive_speed = scroll_speed * distance / half_h
@@ -1126,70 +1070,70 @@ local function scroll_to_center()
         local scroll_max = reaper.ImGui_GetScrollMaxY(ctx)
         target_scroll = math.max(0, math.min(target_scroll, scroll_max))
         
-        -- Проверяем ручной скролл (колесико мыши или драг скроллбара)
+        -- Check for manual scroll (mouse wheel or drag scrollbar)
         local wheel_delta = window_hovered and reaper.ImGui_GetMouseWheel and reaper.ImGui_GetMouseWheel(ctx) or 0
         local mouse_drag = window_hovered and (reaper.ImGui_IsMouseDragging(ctx, 0) or reaper.ImGui_IsMouseDragging(ctx, 1))
         local manual_scroll = (wheel_delta ~= 0) or mouse_drag
         
-        -- Проверяем задержку автоскролла
+        -- Check auto-scroll delay
         local allow_auto_scroll = (cur_time - hovered_time > scroll_delay)
         
-        -- Проверяем, изменилась ли позиция центрального элемента
+        -- Check if the central element position has changed
         local central_changed = (central_y ~= last_central_y)
         
-        -- При ручном скролле немедленно прерываем автоскролл
+        -- If manual scroll, immediately interrupt auto-scroll
         if manual_scroll then
             target_scroll_y = nil
         end
         
         if smooth_scroll_enabled then
-            -- ПЛАВНЫЙ СКРОЛЛ
+            -- SMOOTH SCROLL
             if target_scroll_y then
-                -- Скролл уже идет
+                -- Scroll is already in progress
                 if manual_scroll then
-                    -- Прерываем при ручном скролле
+                    -- Interrupt on manual scroll
                     target_scroll_y = nil
                 elseif central_changed and allow_auto_scroll then
-                    -- Если позиция изменилась и прошла задержка, начинаем новый скролл
+                    -- If the position has changed and the delay has passed, start a new scroll
                     target_scroll_y = target_scroll
                 else
-                    -- Продолжаем текущий скролл
+                    -- Continue the current scroll
                     if not smooth_scroll(target_scroll_y) then
-                        target_scroll_y = nil  -- скролл завершен
+                        target_scroll_y = nil  -- scroll completed 
                     end
                 end
             else
-                -- Скролла нет - начинаем новый только если окно не накрыто и прошла задержка
+                -- No scroll - start a new one only if the window is not hovered and the delay has passed 
                 if not window_hovered and allow_auto_scroll then
                     target_scroll_y = target_scroll
                 end
             end
         else
-            -- МГНОВЕННЫЙ СКРОЛЛ - только если окно не накрыто и прошла задержка
+            -- INSTANT SCROLL - only if the window is not hovered and the delay has passed
             if not window_hovered and allow_auto_scroll then
                 reaper.ImGui_SetScrollY(ctx, target_scroll)
             end
         end
         
-        -- Запоминаем текущую позицию
+        -- Remember the current position for the next check
         last_central_y = central_y
     end
 
 end
 
 local function draw_search_highlight(text, search_query, text_col_w)
-    -- Функция отрисовывает текст с подсветкой найденного слова
-    -- Работает с автопереносом и учитывает ignore_newlines
-    -- ВАЖНО: вызывается ПОСЛЕ установки шрифта и позиции курсора!
+    -- Function to draw text with highlighted search terms
+    -- Works with word wrapping and respects ignore_newlines
+    -- IMPORTANT: called AFTER setting the font and cursor position!
     
     local query_lower = utf8lower(search_query or "")
     local norm = tostring(text or ""):gsub("\r\n","\n"):gsub("\r","\n")
     
-    -- === ВСТРОЕННАЯ ЛОГИКА ПОСТРОЕНИЯ ВИЗУАЛЬНЫХ СТРОК ===
+    -- === BUILT-IN LOGIC FOR CONSTRUCTING VISUAL LINES ===
     local vlines = {}
     
     if auto_wrap_enabled and (text_col_w or 0) > 0 then
-        -- Функция переноса абзаца
+        -- Paragraph wrapping function
         local function wrap_paragraph(paragraph)
             local lines = {}
             local cur = ""
@@ -1200,7 +1144,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
                 local seg_w = reaper.ImGui_CalcTextSize(ctx, segment)
                 
                 if seg_w > text_col_w and cur == "" then
-                    -- Слово шире строки - режем по символам
+                    -- Word wider than line - cut by characters
                     for uchar in segment:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
                         local ww = reaper.ImGui_CalcTextSize(ctx, uchar)
                         if cur_w + ww > text_col_w and cur ~= "" then
@@ -1211,7 +1155,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
                         cur_w = cur_w + ww
                     end
                 elseif cur_w + seg_w > text_col_w and cur ~= "" then
-                    -- Перенос на новую строку
+                    -- Wrap to new line
                     lines[#lines+1] = cur
                     cur, cur_w = segment, seg_w
                 else
@@ -1223,14 +1167,14 @@ local function draw_search_highlight(text, search_query, text_col_w)
             return lines
         end
         
-        -- Обработка текста с учетом ignore_newlines
+        -- Processing text with respect to ignore_newlines
         if ignore_newlines then
-            -- Всё одним абзацем
+            -- Everything in one paragraph
             local chunk = norm:gsub("\n", " ")
             local wrapped = wrap_paragraph(chunk)
             for _, ln in ipairs(wrapped) do vlines[#vlines+1] = ln end
         else
-            -- По абзацам
+            -- By paragraphs
             for para in (norm .. "\n"):gmatch("([^\n]*)\n") do
                 local wrapped = wrap_paragraph(para)
                 for _, ln in ipairs(wrapped) do vlines[#vlines+1] = ln end
@@ -1238,7 +1182,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
             if #vlines == 0 then vlines[1] = "" end
         end
     else
-        -- Без автопереноса
+        -- Without word wrapping - just split by lines respecting ignore_newlines
         if ignore_newlines then
             vlines[1] = norm:gsub("\n"," ")
         else
@@ -1249,7 +1193,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
         end
     end
     
-    -- === ОТРИСОВКА С ПОДСВЕТКОЙ ===
+    -- === DRAWING WITH HIGHLIGHT ===
     local start_x, start_y = reaper.ImGui_GetCursorPos(ctx)
     local line_h = reaper.ImGui_GetTextLineHeight(ctx)
     
@@ -1257,7 +1201,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
         local y_pos = start_y + (li - 1) * line_h
         reaper.ImGui_SetCursorPos(ctx, start_x, y_pos)
         
-        -- Поиск совпадения
+        -- Search for matches in the line
         local name_lower = utf8lower(line)
         local s_pos, e_pos = nil, nil
         if query_lower ~= "" then
@@ -1265,12 +1209,12 @@ local function draw_search_highlight(text, search_query, text_col_w)
         end
         
         if s_pos then
-            -- Найдено - разбиваем на 3 части
+            -- Found - split into 3 parts
             local before = line:sub(1, s_pos - 1)
             local match = line:sub(s_pos, e_pos)
             local after = line:sub(e_pos + 1)
             
-            -- Рисуем с подсветкой
+            -- Draw with highlight
             reaper.ImGui_Text(ctx, before)
             reaper.ImGui_SameLine(ctx, 0, 0)
             reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), color_settings.search_highlight)
@@ -1279,17 +1223,17 @@ local function draw_search_highlight(text, search_query, text_col_w)
             reaper.ImGui_SameLine(ctx, 0, 0)
             reaper.ImGui_Text(ctx, after)
         else
-            -- Нет совпадения
+            -- No match
             reaper.ImGui_Text(ctx, line)
         end
     end
     
-    -- Устанавливаем курсор после последней строки
+    -- Set cursor after the last line
     reaper.ImGui_SetCursorPos(ctx, start_x, start_y + #vlines * line_h)
 end
 
 
--- 🎨 Отрисовка элементов
+-- 🎨 Drawing elements
 local function topmenu()
     if reaper.ImGui_Button(ctx, str.i_import) then
         local info = debug.getinfo(1, "S")
@@ -1301,15 +1245,15 @@ local function topmenu()
     end
 
     reaper.ImGui_SameLine(ctx, 0, 10)
-    -- Проверяем статус оверлея через ExtState
+    -- Check overlay status via ExtState
     local overlay_is_running = reaper.GetExtState("ChirickSubOverlay_Control", "running") == "true"
     local overlay_button_text = overlay_is_running and str.i_overlay .. " ●" or str.i_overlay
     if reaper.ImGui_Button(ctx, overlay_button_text) then
         if overlay_is_running then
-            -- Останавливаем overlay - устанавливаем флаг закрытия
+            -- Stop overlay - set close flag
             reaper.SetExtState("ChirickSubOverlay_Control", "close_request", "true", false)
         else
-            -- Запускаем overlay
+            -- Start overlay
             local info = debug.getinfo(1, "S")
             local base = (info.source:match("@?(.*[\\/])") or "")
             local p = base .. "ch_SubOverlay.lua"
@@ -1334,14 +1278,14 @@ local function topmenu()
                 source_idx = i
                 source_guid = src.guid
                 calculate_time_width()
-                save_settings()  -- сохраняем настройки при смене источника
+                save_settings()  -- save settings when changing source
             end
         end
         reaper.ImGui_EndCombo(ctx)
     end
     reaper.ImGui_PopItemWidth(ctx)
 
-    -- выбор языка
+    -- language selection
     reaper.ImGui_SameLine(ctx, 0, 10)
     if reaper.ImGui_Button(ctx, lang) then
         reaper.ImGui_OpenPopup(ctx, "lang_popup")
@@ -1351,14 +1295,14 @@ local function topmenu()
             if reaper.ImGui_Selectable(ctx, code, code == lang) then
                 lang = code
                 load_language_strings(lang)
-                get_combo_list()  -- пересоздаём комбо список с новыми строками
+                get_combo_list()  -- recreate combo list with new strings
             end
         end
         reaper.SetExtState(SETTINGS, "lang", lang, true)
         reaper.ImGui_EndPopup(ctx)
     end
 
-    -- поле поиска
+    -- search field
     reaper.ImGui_Text(ctx, "🔎")
     reaper.ImGui_SameLine(ctx, 0, 5)
     reaper.ImGui_PushItemWidth(ctx, 214)
@@ -1390,7 +1334,7 @@ local function context_menu()
         end
         
         reaper.ImGui_Text(ctx, str.c_regions)
-        -- Шрифт для регионов
+        -- Font for regions
         if reaper.ImGui_BeginCombo(ctx, "##region_font", font_names[font_settings.region.idx]) then
             for i, name in ipairs(font_names) do
                 if reaper.ImGui_Selectable(ctx, name, i == font_settings.region.idx) then
@@ -1401,13 +1345,13 @@ local function context_menu()
             reaper.ImGui_EndCombo(ctx)
         end
         tooltip(str.t_region_font)
-        -- Масштаб для регионов
+        -- Scale for regions
         font_settings.region.scale = add_change(reaper.ImGui_SliderInt(ctx, "##region_scale", font_settings.region.scale, 10, 100))
         tooltip(str.t_region_scale)
         
         reaper.ImGui_Separator(ctx)
         reaper.ImGui_Text(ctx, str.c_items)
-        -- Шрифт для итемов
+        -- Font for items
         if reaper.ImGui_BeginCombo(ctx, "##item_font", font_names[font_settings.item.idx]) then
             for i, name in ipairs(font_names) do
                 if reaper.ImGui_Selectable(ctx, name, i == font_settings.item.idx) then
@@ -1418,11 +1362,11 @@ local function context_menu()
             reaper.ImGui_EndCombo(ctx)
         end
         tooltip(str.t_item_font)
-        -- Масштаб для итемов
+        -- Scale for items
         font_settings.item.scale = add_change(reaper.ImGui_SliderInt(ctx, "##item_scale", font_settings.item.scale, 10, 100))
         tooltip(str.t_item_scale)
 
-        -- Центральный масштаб
+        -- Central scale
         reaper.ImGui_Separator(ctx)
         central_scale_enabled = add_change(reaper.ImGui_Checkbox(ctx, str.c_central_scale, central_scale_enabled or false))
         tooltip(str.t_central_scale_title)
@@ -1431,7 +1375,7 @@ local function context_menu()
             tooltip(str.t_central_scale)
         end
 
-        -- Цвета
+        -- Colors
         reaper.ImGui_Separator(ctx)
         local function color_edit(label, val)
             local changed
@@ -1448,7 +1392,7 @@ local function context_menu()
         color_settings.item.highlight   = color_edit(str.c_item_highlight, color_settings.item.highlight)
         color_settings.search_highlight = color_edit(str.c_search_highlight, color_settings.search_highlight)
 
-        -- Функции
+        -- Functions
         reaper.ImGui_Separator(ctx)
         smooth_scroll_enabled = add_change(reaper.ImGui_Checkbox(ctx, str.c_smooth_scroll, smooth_scroll_enabled))
         tooltip(str.t_smooth_scroll)
@@ -1460,30 +1404,27 @@ local function context_menu()
         tooltip(str.t_ignore_newlines)
         if old_ignore_newlines ~= ignore_newlines then
             invalidate_combined_cache()
-            update() -- пересобираем данные при изменении опции
+            update() -- rescan data on option change
         end
 
         auto_update_enabled = add_change(reaper.ImGui_Checkbox(ctx, str.c_auto_update, auto_update_enabled))
         tooltip(str.t_auto_update)
 
-        -- Подсказки + задержка
-        reaper.ImGui_Separator(ctx)
-        show_tooltips = add_change(reaper.ImGui_Checkbox(ctx, str.c_show_tooltips, show_tooltips))
-        tooltip(str.t_show_tooltips)
-        
-        -- Автозапуск при старте REAPER
+        -- Autostart on REAPER start
         local old_autostart = autostart_on_reaper
         autostart_on_reaper = add_change(reaper.ImGui_Checkbox(ctx, str.c_autostart_reaper, autostart_on_reaper))
         tooltip(str.t_autostart_reaper)
-        
-        -- Если изменилась настройка автозапуска - обновляем __startup.lua
         if old_autostart ~= autostart_on_reaper then
             manage_startup_autostart(autostart_on_reaper)
             ch = ch + 1
         end
         
+        -- Tooltips + delay
+        reaper.ImGui_Separator(ctx)
+        show_tooltips = add_change(reaper.ImGui_Checkbox(ctx, str.c_show_tooltips, show_tooltips))
+        tooltip(str.t_show_tooltips)
         
-        -- Сохраняем настройки только если были изменения
+        -- Save settings only if there were changes
         if ch > 0 then
             calculate_time_width()
             save_settings()
@@ -1497,7 +1438,7 @@ local function context_menu()
 end
 
 local function draw_list()
-    -- задаем количество центральных элементов
+    -- set number of central elements
     local central_count = 0
     central_y = nil
 
@@ -1507,14 +1448,14 @@ local function draw_list()
     local idx_list
     
     if search and search ~= "" then
-        -- Для поиска ищем индекс в отфильтрованных данных
+        -- For search, find index in filtered data
         idx_list = get_current_index(pos, {data = display_data, kind = src.kind, guid = src.guid})
     else
-        -- Без поиска ищем индекс в исходных данных
+        -- Without search, find index in original data
         idx_list = get_current_index(pos, src)
     end
     
-    -- Создаем set для быстрой проверки
+    -- Create set for quick check
     local idx_set = {}
     if idx_list then
         for _, idx in ipairs(idx_list) do
@@ -1522,12 +1463,12 @@ local function draw_list()
         end
     end
 
-    -- Если список пустой - ничего не рисуем
+    -- If list is empty - draw nothing
     if #display_data == 0 then
         return
     end
 
-    -- Определяем базовые стили в зависимости от типа источника
+    -- Define base styles based on source type
     local base_font, base_scale, base_color, base_highlight
     if src.kind == "regions" then
         base_font, base_scale, base_color, base_highlight = font_settings.region.font, font_settings.region.scale, color_settings.region.normal, color_settings.region.highlight
@@ -1535,14 +1476,14 @@ local function draw_list()
         base_font, base_scale, base_color, base_highlight = font_settings.item.font, font_settings.item.scale, color_settings.item.normal, color_settings.item.highlight
     end
 
-    -- отрисовываем список
+    -- draw list
     for i, r in ipairs(display_data) do
         local time, line = r.start_str, (r.name or "")
         
-        -- Проверяем, является ли элемент центральным
+        -- Check if element is central
         local is_current = idx_set[i]
         
-        -- Определяем стили для конкретного элемента (для combined источника)
+        -- Define styles for specific element (for combined source)
         local element_font, element_scale, element_color, element_highlight = base_font, base_scale, base_color, base_highlight
         if src.kind == "combined" then
             if r.type == "region" then
@@ -1558,7 +1499,7 @@ local function draw_list()
             end
         end
         
-        -- Вычисляем central_scale ПОСЛЕ определения element_scale для конкретного типа
+        -- Calculate central_scale AFTER defining element_scale for specific type
         local element_central_scale
         if central_scale_enabled then
             element_central_scale = element_scale*central_scale
@@ -1566,10 +1507,10 @@ local function draw_list()
             element_central_scale = element_scale
         end
         
-        -- считываем начало курсора
+        -- read cursor start
         local x1, y1 = reaper.ImGui_GetCursorPos(ctx)
         
-        -- Применяем стили
+        -- Apply styles
         if is_current then
             central_count = central_count + 1
             reaper.ImGui_PushFont(ctx, element_font, element_central_scale)
@@ -1579,13 +1520,13 @@ local function draw_list()
             reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), element_color)
         end
 
-        -- включаем автоперенос
+        -- enable auto-wrap
         if auto_wrap_enabled then
             reaper.ImGui_PushTextWrapPos(ctx, ui_dimensions.win_width-10)
         end
     
 
-        -- рисуем текст
+        -- draw text
         reaper.ImGui_Text(ctx, time)
         reaper.ImGui_SameLine(ctx)
         if is_current and central_count == 1 then
@@ -1593,46 +1534,46 @@ local function draw_list()
             reaper.ImGui_SameLine(ctx)
         end
         
-        -- Устанавливаем позицию для текста
+        -- Set position for text
         reaper.ImGui_SetCursorPosX(ctx, ui_dimensions.time_width + ui_dimensions.space_width)
         
         if search and search ~= "" then
-            -- Отрисовка с подсветкой поиска
+            -- Draw with search highlight
             local text_col_w = ui_dimensions.win_width - 10 - ui_dimensions.time_width - ui_dimensions.space_width
             draw_search_highlight(line, search, text_col_w)
         else
-            -- Обычная отрисовка
+            -- Regular draw
             reaper.ImGui_Text(ctx, line)
         end
 
-        -- отключаем стиль
+        -- disable style
         reaper.ImGui_PopStyleColor(ctx)
         reaper.ImGui_PopFont(ctx)
         
 
-        -- считываем конец курсора
+        -- read cursor end
         local x2, y2 = reaper.ImGui_GetCursorPos(ctx)
         
-        -- Запоминаем позицию первого центрального элемента
+        -- Remember position of first central element
         if central_count == 1 and not central_y then
             central_y = y1 + (y2 - y1) * 0.5
         end
         
-        -- рисуем кнопку
+        -- draw button
         reaper.ImGui_SetCursorPos(ctx, x1, y1)
-        -- if reaper.ImGui_Button(ctx, "##row_"..i, -1, y2 - y1) then -- видимая кнопка
+        -- if reaper.ImGui_Button(ctx, "##row_"..i, -1, y2 - y1) then -- visible button
         --     reaper.SetEditCurPos(r.start_time or 0, true, true)
         -- end
         if reaper.ImGui_InvisibleButton(ctx, "##row_"..i, -1, y2 - y1) then
-            -- Переходим на позицию
+            -- Jump to position
             reaper.SetEditCurPos(r.start_time or 0, true, true)
-            -- Копируем текст с таймингом в буфер обмена
+            -- Copy text with timing to clipboard
             reaper.ImGui_SetClipboardText(ctx, string.format("%s - %s", r.start_str or "", r.name or ""))
         end
 
     end
         
-    -- отключаем шрифты и стили
+    -- disable fonts and styles
     if auto_wrap_enabled then
         reaper.ImGui_PopTextWrapPos(ctx)
     end
@@ -1653,12 +1594,12 @@ local function debug_window()
     reaper.ImGui_End(ctx)
 end
 
--- 🚦 Основной цикл
+-- 🚦 Main loop
 local function loop()
-    cursor = reaper.GetCursorPosition()                             -- позиция курсора
-    playhead = reaper.GetPlayPosition()                             -- позиция плейхеда
-    ps = reaper.GetPlayState()                                      -- проигрывается ли проект
-    cur_time = reaper.time_precise()                                -- текущее время
+    cursor = reaper.GetCursorPosition()                             -- cursor position
+    playhead = reaper.GetPlayPosition()                             -- playhead position
+    ps = reaper.GetPlayState()                                      -- is project playing
+    cur_time = reaper.time_precise()                                -- current time
     
     if auto_update_enabled and project_changed() then
         invalidate_combined_cache()
@@ -1670,10 +1611,10 @@ local function loop()
     reaper.ImGui_SetNextWindowPos(ctx, 300, 200, reaper.ImGui_Cond_FirstUseEver())
     local visible, open = reaper.ImGui_Begin(ctx, TITLE, true)
     if visible then
-        -- Верхнее меню
+        -- Top menu
         topmenu()
 
-        -- Дочернее окно
+        -- Child window
         if reaper.ImGui_BeginChild(ctx, "child", 0, 0, 0) then
             ui_dimensions.win_width, ui_dimensions.win_height = reaper.ImGui_GetWindowSize(ctx)
             window_hovered = reaper.ImGui_IsWindowHovered(ctx)
@@ -1685,10 +1626,10 @@ local function loop()
                 reaper.ImGui_TextWrapped( ctx, str.i_empty )
             end
 
-            -- Скролл к центральному элементу
+            -- Scroll to central element
             scroll_to_center()
 
-            -- ПКМ → контекстное меню
+            -- Right-click → context menu
             if window_hovered and reaper.ImGui_IsMouseClicked(ctx, 1) then
                 reaper.ImGui_OpenPopup(ctx, "ctx_menu")
                 want_context_menu = true
