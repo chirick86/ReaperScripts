@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="71205fcbee72c080b700ed3c154f057f53840ce4">
+<index version="1" name="chirick" commit="164db4283df308276122368400327286c30db91d">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -23,7 +23,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JS_ReaScript Extensions (install via ReaPack)\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -56,7 +56,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -91,7 +91,7 @@
 {\pard \ql \f0 \sa180 \li0 \fi0 {\b Note:} Backup project before running!\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -116,7 +116,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Useful for converting track content to timeline marking\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -140,7 +140,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for transferring marking to tracks\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -164,7 +164,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Suitable for transferring subtitles to other programs\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -189,7 +189,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quick way to create subtitles from project marking\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -197,6 +197,28 @@
 + Export project regions to SRT file
 + Creates standard SRT file with timecodes]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_regions_to_srt.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_hello_world.lua" type="script" desc="Hello world">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Hello world script\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Test script to verify REAPER API access and console output\par}
+}
+]]></description>
+        <link rel="website" href="http://forum.cockos.com/showthread.php?t=169127">Forum Thread</link>
+        <link rel="website" href="https://github.com/chirick86/reaperscripts">Github repository</link>
+        <link rel="website" href="https://www.reddit.com/r/Reaper/">Reddit thread</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T23:14:15Z">
+        <changelog><![CDATA[+ Initial release
++ test script to verify REAPER API access and console output
++ Added metadata and description for testing purposes]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/164db4283df308276122368400327286c30db91d/Subtitles/ch_hello_world.lua</source>
       </version>
     </reapack>
     <reapack name="ch_import_regions_from_sub.lua" type="script" desc="Import regions from subtitles">
@@ -215,7 +237,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for quick project marking by subtitles\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
@@ -243,7 +265,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Items are created with precise timecode and text in Notes\sa180\par}
 }
 ]]></description>
-        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
         <link rel="donation">https://patreon.com/chirick</link>
       </metadata>
       <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
