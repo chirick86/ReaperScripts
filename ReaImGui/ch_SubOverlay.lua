@@ -29,6 +29,10 @@
 --   ## Requirements
 --   * ReaImGui (install via ReaPack)
 
+--[[TODO:
+-- Save commandID in ExtState
+-- check some moments in auto-wrap combined with auto-resize]]
+
 if not reaper.ImGui_CreateContext then
     reaper.ShowMessageBox("ReaImGui not found. Install ReaImGui.", "Error", 0)
     return

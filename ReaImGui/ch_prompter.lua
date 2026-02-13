@@ -30,6 +30,8 @@
 --   * ReaImGui (install via ReaPack)
 --   * JS_ReaScript Extensions (install via ReaPack)
         
+--[[TODO:
+-- Save commandID in ExtState]]
 
 if not reaper.ImGui_CreateContext then
     reaper.ShowMessageBox("ReaImGui not found. Install via ReaPack.", "Error", 0)
@@ -368,10 +370,11 @@ local tooltip_state    = {}  -- table of states (keyed by tooltip text)
 local STARTUP_MARKER_BEGIN = "-- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK"
 local STARTUP_MARKER_END = "-- [CHIRICK_PROMPTER_AUTOSTART_END]"
 
--- get command ID of the current script
+-- get stable script identifier (and numeric ID if needed)
 local function get_script_command_id()
-    local _, _, _, cmdID = reaper.get_action_context()
-    return cmdID
+    local _, _, section, cmdID = reaper.get_action_context()
+    -- Return stable script identifier (_RS...)
+    return reaper.ReverseNamedCommandLookup(cmdID), cmdID
 end
 
 local function manage_startup_autostart(enable)
@@ -386,19 +389,20 @@ local function manage_startup_autostart(enable)
     local block_end = content:find(STARTUP_MARKER_END, 1, true)
     
     if enable then
-        -- Get command ID of the script
-        local cmdID = get_script_command_id()
+        -- Get stable script identifier
+        local scriptID, numID = get_script_command_id()
         
         -- Add the block if it doesn't exist
-        if not block_start and cmdID then
+        if not block_start and scriptID then
+            scriptID = "_" .. scriptID  -- Ensure it has the _RS prefix
             local new_block = string.format([[
 
             -- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK
             if reaper.GetExtState("Chirick Prompter", "autostart_on_reaper") == "true" then
-                reaper.Main_OnCommand(%d, 0)
+                reaper.Main_OnCommand(reaper.NamedCommandLookup("%s"), 0)
             end
             -- [CHIRICK_PROMPTER_AUTOSTART_END]
-            ]], cmdID)
+            ]], scriptID)
             content = content .. new_block
         end
     else
