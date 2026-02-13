@@ -1191,8 +1191,8 @@ local function topmenu()
     if reaper.ImGui_Button(ctx, str.i_import) then
         local info = debug.getinfo(1, "S")
         local base = (info.source:match("@?(.*[\\/])") or "")
-        local p1 = base .. "ch_import_text_items_from_sub.lua"
-        local p2 = base .. "ch_create_regions_from_text_items.lua"
+        local p1 = base .. "..\\Subtitles\\ch_import_text_items_from_sub.lua"
+        local p2 = base .. "..\\Subtitles\\ch_create_regions_from_text_items.lua"
         if reaper.file_exists(p1) then dofile(p1) end
         if reaper.file_exists(p2) then dofile(p2) end
     end
