@@ -1,6 +1,6 @@
 -- @description Hello world
 -- @author Chirick
--- @version 1.0.1
+-- @version 1.0.2
 -- @changelog
 --   + added ko-fi link
 --   + added provides section
