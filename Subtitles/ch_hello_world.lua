@@ -5,7 +5,7 @@
 --   + added ko-fi link
 --   + added provides section
 -- @provides
---   icons_fonts_readme/*.png
+--   ../icons_fonts_readme/*.png
 -- @links
 --   Forum Thread       http://forum.cockos.com/showthread.php?t=169127
 --   Github repository  https://github.com/chirick86/reaperscripts
