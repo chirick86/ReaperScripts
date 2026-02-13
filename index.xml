@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="9393595c56ff40881df6057af219acf1152ee779">
-<category name="ReaImGui"><reapack name="ch_prompter.lua" type="script" desc="Prompter"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+<index version="1" name="chirick" commit="71205fcbee72c080b700ed3c154f057f53840ce4">
+  <category name="ReaImGui">
+    <reapack name="ch_prompter.lua" type="script" desc="Prompter">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -13,17 +16,29 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Customizable fonts, colors and sizes for regions and items separately\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Search with highlighted results\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab "All elements" mode - combines regions and items in one timeline-sorted list\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smooth scrolling and current line magnification\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smooth scrolling and current line magnification\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Autostart SubOverlay when Prompter starts (optional)\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JS_ReaScript Extensions (install via ReaPack)\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Prompter for subtitles (regions/items) in REAPER
 + Automatically highlights current line based on playback position
 + Customizable fonts, colors and sizes
 + Search functionality with highlighted results
-+ Smooth scrolling and current line magnification]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_prompter.lua</source></version></reapack><reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ Smooth scrolling and current line magnification]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_prompter.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -40,13 +55,26 @@
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Subtitle overlay over REAPER video window
 + Shows current and next region/item text during playback
 + Can be attached to video window (automatically follows it)
 + Customizable fonts, colors, shadows
 + Progress bar for current region/item
-+ Smart line wrapping, vertical and horizontal alignment]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_SubOverlay.lua</source></version></reapack></category><category name="Subtitles"><reapack name="ch_convert_sws_subs_to_Regions.lua" type="script" desc="Convert SWS subtitles to regions"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ Smart line wrapping, vertical and horizontal alignment]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_SubOverlay.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Subtitles">
+    <reapack name="ch_convert_sws_subs_to_Regions.lua" type="script" desc="Convert SWS subtitles to regions">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -62,9 +90,20 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Script will abort if the project is not saved\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 {\b Note:} Backup project before running!\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Convert SWS S&M subtitles to full timeline regions
-+ Fixed standalone script]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_convert_sws_subs_to_Regions.lua</source></version></reapack><reapack name="ch_create_regions_from_text_items.lua" type="script" desc="Create regions from text items"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ Fixed standalone script]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_convert_sws_subs_to_Regions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_create_regions_from_text_items.lua" type="script" desc="Create regions from text items">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -76,8 +115,19 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Region timing matches items\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Useful for converting track content to timeline marking\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
-+ Convert text items to project regions]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_regions_from_text_items.lua</source></version></reapack><reapack name="ch_create_text_items_from_regions.lua" type="script" desc="Create text items from regions"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
++ Convert text items to project regions]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_regions_from_text_items.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_create_text_items_from_regions.lua" type="script" desc="Create text items from regions">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -89,8 +139,19 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Item timing matches regions\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for transferring marking to tracks\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
-+ Convert project regions to text items on new track]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_text_items_from_regions.lua</source></version></reapack><reapack name="ch_export_items_to_srt.lua" type="script" desc="Export items to SRT"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
++ Convert project regions to text items on new track]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_text_items_from_regions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_export_items_to_srt.lua" type="script" desc="Export items to SRT">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -102,9 +163,20 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Text is taken from Notes of each item\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Suitable for transferring subtitles to other programs\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Export text items from selected track to SRT file
-+ Creates standard SRT file with timecodes]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_items_to_srt.lua</source></version></reapack><reapack name="ch_export_regions_to_srt.lua" type="script" desc="Export regions to SRT"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ Creates standard SRT file with timecodes]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_items_to_srt.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_export_regions_to_srt.lua" type="script" desc="Export regions to SRT">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -116,9 +188,20 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Region names become subtitle text\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quick way to create subtitles from project marking\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Export project regions to SRT file
-+ Creates standard SRT file with timecodes]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_regions_to_srt.lua</source></version></reapack><reapack name="ch_import_regions_from_sub.lua" type="script" desc="Import regions from subtitles"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ Creates standard SRT file with timecodes]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_export_regions_to_srt.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_import_regions_from_sub.lua" type="script" desc="Import regions from subtitles">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -131,11 +214,22 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Regions are created with subtitle text as names and precise timecode\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convenient for quick project marking by subtitles\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Import subtitles to regions
 + Supports SRT and ASS formats
 + Auto-detects encoding (UTF-8, CP1251, CP866)
-+ For ASS files with roles - assigns unique color to each role]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_regions_from_sub.lua</source></version></reapack><reapack name="ch_import_text_items_from_sub.lua" type="script" desc="Import text items from subtitles"><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ For ASS files with roles - assigns unique color to each role]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_regions_from_sub.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_import_text_items_from_sub.lua" type="script" desc="Import text items from subtitles">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -148,11 +242,22 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tracks are named by filename (or "filename - role" for ASS with roles)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Items are created with precise timecode and text in Notes\sa180\par}
 }
-]]></description><link rel="website">https://github.com/chirick/reaperscripts</link><link rel="donation">https://patreon.com/chirick</link></metadata><version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z"><changelog><![CDATA[+ Initial release
+]]></description>
+        <link rel="website">https://github.com/chirick/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-13T11:04:17Z">
+        <changelog><![CDATA[+ Initial release
 + Import subtitles to text items
 + Supports SRT and ASS formats (multiple file selection)
 + Auto-detects encoding (UTF-8, CP1251, CP866)
-+ For ASS files with roles - creates separate track for each role]]></changelog><source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_text_items_from_sub.lua</source></version></reapack></category><metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
++ For ASS files with roles - creates separate track for each role]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_text_items_from_sub.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <metadata>
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -282,4 +387,6 @@ ReaPack
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Add scripts to toolbar\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Right-click on toolbar button \u8594 ? Set button icon\sa180\par}
 }
-]]></description></metadata></index>
+]]></description>
+  </metadata>
+</index>
