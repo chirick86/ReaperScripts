@@ -8,6 +8,8 @@
 --   + Customizable fonts, colors and sizes
 --   + Search functionality with highlighted results
 --   + Smooth scrolling and current line magnification
+--   + Autostart SubOverlay when Prompter starts (optional)
+--   + Autostart Prompter with REAPER (optional)
 -- @link https://github.com/chirick/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -23,7 +25,7 @@
 --   * Search with highlighted results
 --   * "All elements" mode - combines regions and items in one timeline-sorted list
 --   * Smooth scrolling and current line magnification
---   
+--   * Autostart SubOverlay when Prompter starts (optional)
 --   ## Requirements
 --   * ReaImGui (install via ReaPack)
 --   * JS_ReaScript Extensions (install via ReaPack)
@@ -117,6 +119,8 @@ local i18n = {
         c_ignore_newlines = "Ignore line breaks",
         c_auto_update = "Auto-update",
         c_show_tooltips = "Tooltips",
+        c_autostart_reaper = "Autostart on REAPER",
+        t_autostart_reaper = "Automatically launch Prompter when REAPER starts",
         -- Context menu items - colors
         c_region_color = "Regions",
         c_region_highlight = "Current region",
@@ -156,6 +160,8 @@ local i18n = {
         c_ignore_newlines = "Zeilenumbrüche ignorieren",
         c_auto_update = "Automatische Aktualisierung",
         c_show_tooltips = "Tooltips",
+        c_autostart_reaper = "Autostart bei REAPER",
+        t_autostart_reaper = "Prompter automatisch starten, wenn REAPER startet",
         -- Kontextmenü-Einträge - Farben
         c_region_color = "Regionen",
         c_region_highlight = "Aktuelle Region",
@@ -195,6 +201,8 @@ local i18n = {
         c_ignore_newlines = "Ignorer les sauts de ligne",
         c_auto_update = "Mise à jour automatique",
         c_show_tooltips = "Info-bulles",
+        c_autostart_reaper = "Démarrage auto avec REAPER",
+        t_autostart_reaper = "Lancer automatiquement Prompter au démarrage de REAPER",
         -- Éléments du menu contextuel - Couleurs
         c_region_color = "Régions",
         c_region_highlight = "Région actuelle",
@@ -234,6 +242,8 @@ local i18n = {
         c_ignore_newlines = "Игнорировать подстроки",
         c_auto_update = "Автообновление",
         c_show_tooltips = "Подсказки",
+        c_autostart_reaper = "Автозапуск с REAPER",
+        t_autostart_reaper = "Автоматически запускать Prompter при старте REAPER",
         -- Пункты контекстного меню - цвета
         c_region_color = "Регионы",
         c_region_highlight = "Текущий регион",
@@ -273,6 +283,8 @@ local i18n = {
         c_ignore_newlines = "Ігнорувати розриви рядків",
         c_auto_update = "Автооновлення",
         c_show_tooltips = "Підказки",
+        c_autostart_reaper = "Автозапуск з REAPER",
+        t_autostart_reaper = "Автоматично запускати Prompter при старті REAPER",
         -- Пункти контекстного меню - кольори
         c_region_color = "Регіони",
         c_region_highlight = "Поточний регіон",
@@ -362,6 +374,7 @@ local central_scale = 1.2
 local central_scale_enabled = false
 local auto_wrap_enabled = true      -- автоперенос длинных строк
 local ignore_newlines   = false     -- замена \n на пробелы
+local autostart_on_reaper = false   -- автозапуск Prompter при старте REAPER
 
 -- цвета
 local color_settings = {
@@ -388,7 +401,76 @@ local tooltip_delay    = 0.5
 local tooltip_state    = {}  -- таблица состояний (по ключу текста подсказки)
 
 
--- 💾 Сохранение/загрузка настроек
+-- � Управление автозапуском через __startup.lua
+local STARTUP_MARKER_BEGIN = "-- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK"
+local STARTUP_MARKER_END = "-- [CHIRICK_PROMPTER_AUTOSTART_END]"
+
+-- Получаем command ID текущего скрипта
+local function get_script_command_id()
+    local _, _, sectionID, cmdID = reaper.get_action_context()
+    return sectionID, cmdID
+end
+
+local function manage_startup_autostart(enable)
+    local startup_path = reaper.GetResourcePath() .. "/Scripts/__startup.lua"
+    
+    -- Читаем текущий содержимое файла
+    local file = io.open(startup_path, "r")
+    local content = ""
+    if file then
+        content = file:read("*all")
+        file:close()
+    end
+    
+    -- Ищем наш блок между маркерами
+    local block_start = content:find(STARTUP_MARKER_BEGIN, 1, true)
+    local block_end = content:find(STARTUP_MARKER_END, 1, true)
+    
+    if enable then
+        -- Получаем command ID скрипта
+        local sectionID, cmdID = get_script_command_id()
+        
+        -- Добавляем блок если его нет
+        if not block_start and cmdID then
+            local new_block = string.format([[
+
+-- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK
+if reaper.GetExtState("Chirick Prompter", "autostart_on_reaper") == "true" then
+    reaper.Main_OnCommand(%d, 0)
+end
+-- [CHIRICK_PROMPTER_AUTOSTART_END]
+]], cmdID)
+            content = content .. new_block
+            
+            -- Записываем обновленный файл
+            file = io.open(startup_path, "w")
+            if file then
+                file:write(content)
+                file:close()
+                return true
+            end
+        end
+    else
+        -- Удаляем блок если он есть
+        if block_start and block_end then
+            local before = content:sub(1, block_start - 1)
+            local after = content:sub(block_end + #STARTUP_MARKER_END)
+            content = before .. after
+            
+            -- Записываем обновленный файл
+            file = io.open(startup_path, "w")
+            if file then
+                file:write(content)
+                file:close()
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+
+-- �💾 Сохранение/загрузка настроек
 local function save_settings()
     reaper.SetExtState(SETTINGS, "region_font_idx",   tostring(font_settings.region.idx), true)
     reaper.SetExtState(SETTINGS, "region_scale", tostring(font_settings.region.scale), true)
@@ -409,6 +491,7 @@ local function save_settings()
     reaper.SetExtState(SETTINGS, "space_width",   tostring(ui_dimensions.space_width), true)
     reaper.SetExtState(SETTINGS, "auto_update_enabled", tostring(auto_update_enabled), true)
     reaper.SetExtState(SETTINGS, "lang", lang, true)
+    reaper.SetExtState(SETTINGS, "autostart_on_reaper", tostring(autostart_on_reaper), true)
 
     -- Сохраняем выбранный источник в настройки проекта
     if combo_sources[source_idx] then
@@ -468,6 +551,24 @@ local function load_settings()
     local retval, local_source_guid = reaper.GetProjExtState(0, SETTINGS, "source_guid")
     if retval then
         source_guid = local_source_guid
+    end
+    
+    -- Загружаем настройку автозапуска Prompter при старте REAPER
+    autostart_on_reaper = read_bool("autostart_on_reaper", false)
+    
+    -- Автозапуск SubOverlay если включен
+    local autostart_overlay = reaper.GetExtState("ChirickSubOverlay_Control", "autostart_on_prompter")
+    if autostart_overlay == "true" then
+        local overlay_is_running = reaper.GetExtState("ChirickSubOverlay_Control", "running") == "true"
+        if not overlay_is_running then
+            -- Запускаем SubOverlay
+            local info = debug.getinfo(1, "S")
+            local base = (info.source:match("@?(.*[\\/])") or "")
+            local p = base .. "ch_SubOverlay.lua"
+            if reaper.file_exists(p) then
+                dofile(p)
+            end
+        end
     end
 
 end
@@ -565,6 +666,8 @@ local function load_language_strings(lang_code)
     str.c_ignore_newlines = trans.c_ignore_newlines
     str.c_auto_update    = trans.c_auto_update
     str.c_show_tooltips  = trans.c_show_tooltips
+    str.c_autostart_reaper = trans.c_autostart_reaper
+    str.t_autostart_reaper = trans.t_autostart_reaper
     str.c_region_color   = trans.c_region_color
     str.c_region_highlight = trans.c_region_highlight
     str.c_item_color     = trans.c_item_color
@@ -1367,6 +1470,17 @@ local function context_menu()
         reaper.ImGui_Separator(ctx)
         show_tooltips = add_change(reaper.ImGui_Checkbox(ctx, str.c_show_tooltips, show_tooltips))
         tooltip(str.t_show_tooltips)
+        
+        -- Автозапуск при старте REAPER
+        local old_autostart = autostart_on_reaper
+        autostart_on_reaper = add_change(reaper.ImGui_Checkbox(ctx, str.c_autostart_reaper, autostart_on_reaper))
+        tooltip(str.t_autostart_reaper)
+        
+        -- Если изменилась настройка автозапуска - обновляем __startup.lua
+        if old_autostart ~= autostart_on_reaper then
+            manage_startup_autostart(autostart_on_reaper)
+            ch = ch + 1
+        end
         
         
         -- Сохраняем настройки только если были изменения

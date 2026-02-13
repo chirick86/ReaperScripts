@@ -9,6 +9,7 @@
 --   + Customizable fonts, colors, shadows
 --   + Progress bar for current region/item
 --   + Smart line wrapping, vertical and horizontal alignment
+--   + Autostart with Prompter
 -- @link https://github.com/chirick/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -61,6 +62,7 @@ end
 local CONTROL_SECTION = "ChirickSubOverlay_Control"
 local RUNNING_KEY = "running"
 local CLOSE_REQUEST_KEY = "close_request"
+local AUTOSTART_KEY = "autostart_on_prompter"
 
 -- Считываем состояние
 local close_req = reaper.GetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY)
@@ -154,6 +156,7 @@ local attach_to_video = false           -- привязывать к видео�
 local attach_bottom = false             -- режим привязки: "bottom"
 local attach_offset = 0                 -- отступ в процентах (0-100)
 local ignore_newlines = false           -- игнорировать символы переноса строки при чтении
+local autostart_on_prompter = false     -- автозапуск при старте Prompter
 
 
 
@@ -244,6 +247,9 @@ local i18n = {
         -- Language
         c_language = "Language",
         t_language = "Click to select display language",
+        -- Autostart
+        c_autostart = "Autostart on Prompter",
+        t_autostart = "Automatically launch SubOverlay when Prompter starts",
         -- Buttons
         b_close = "Close window"
     },
@@ -311,6 +317,9 @@ local i18n = {
         -- Sprache
         c_language = "Sprache",
         t_language = "Klicken Sie, um die Anzeigesprache auszuwählen",
+        -- Autostart
+        c_autostart = "Autostart bei Prompter",
+        t_autostart = "SubOverlay automatisch starten, wenn Prompter startet",
         -- Schaltflächen
         b_close = "Fenster schließen"
     },
@@ -378,6 +387,9 @@ local i18n = {
         -- Langue
         c_language = "Langue",
         t_language = "Cliquez pour sélectionner la langue d'affichage",
+        -- Autostart
+        c_autostart = "Démarrage auto sur Prompter",
+        t_autostart = "Lancer automatiquement SubOverlay au démarrage de Prompter",
         -- Boutons
         b_close = "Fermer la fenêtre"
     },
@@ -445,6 +457,9 @@ local i18n = {
         -- Язык
         c_language = "Язык",
         t_language = "Нажмите для выбора языка интерфейса",
+        -- Автозапуск
+        c_autostart = "Автозапуск с Prompter",
+        t_autostart = "Автоматически запускать SubOverlay при старте Prompter",
         -- Кнопки
         b_close = "Закрыть окно"
     },
@@ -512,6 +527,9 @@ local i18n = {
         -- Мова
         c_language = "Мова",
         t_language = "Натисніть, щоб вибрати мову інтерфейсу",
+        -- Автозапуск
+        c_autostart = "Автозапуск з Prompter",
+        t_autostart = "Автоматично запускати SubOverlay при старті Prompter",
         -- Кнопки
         b_close = "Закрити вікно"
     }
@@ -587,6 +605,8 @@ local function load_language_strings(lang_code)
     str.c_shadow2 = trans.c_shadow2
     str.c_language = trans.c_language
     str.t_language = trans.t_language
+    str.c_autostart = trans.c_autostart
+    str.t_autostart = trans.t_autostart
     str.b_close = trans.b_close
 end
 
@@ -627,6 +647,8 @@ local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "attach_offset", tostring(attach_offset), true)
     reaper.SetExtState(SETTINGS_SECTION, "ignore_newlines", tostring(ignore_newlines), true)
     reaper.SetExtState(SETTINGS_SECTION, "lang", lang, true)
+    -- Сохраняем autostart в общую секцию CONTROL_SECTION для доступа из Prompter
+    reaper.SetExtState(CONTROL_SECTION, AUTOSTART_KEY, tostring(autostart_on_prompter), true)
     -- Сохраняем высоту только если включена привязка к видеоокну
     if attach_to_video then
         reaper.SetExtState(SETTINGS_SECTION, "win_h", tostring(win_h), true)
@@ -676,6 +698,9 @@ local function load_settings()
     ignore_newlines = (reaper.GetExtState(SETTINGS_SECTION, "ignore_newlines") == "true")
     lang = reaper.GetExtState(SETTINGS_SECTION, "lang") or lang
     load_language_strings(lang)
+    -- Загружаем autostart из общей секции CONTROL_SECTION
+    local autostart_str = reaper.GetExtState(CONTROL_SECTION, AUTOSTART_KEY)
+    autostart_on_prompter = (autostart_str == "true")
     -- Загружаем высоту только если включена привязка к видеоокну
     if attach_to_video then
         win_h = tonumber(reaper.GetExtState(SETTINGS_SECTION, "win_h")) or 300
@@ -912,6 +937,8 @@ local function draw_context_menu()
         reaper.ImGui_Separator(ctx)
         flags.NoDocking = add_change(reaper.ImGui_Checkbox(ctx, str.c_no_dock, flags.NoDocking))
         tooltip(str.t_no_dock)
+        autostart_on_prompter = add_change(reaper.ImGui_Checkbox(ctx, str.c_autostart, autostart_on_prompter))
+        tooltip(str.t_autostart)
         show_tooltips   = add_change(reaper.ImGui_Checkbox(ctx, str.c_tooltips, show_tooltips))
         tooltip(str.t_tooltips)
 
