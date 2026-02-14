@@ -1,11 +1,11 @@
 -- @description Icons and fonts
 -- @author Chirick
--- @version 1.0.1
+-- @version 1.0.0
 -- @changelog
 --   + added ko-fi link
 --   + added provides section
 -- @provides
---   ../icons_fonts_readme/*.* > ../../../Data/toolbar_icons
+--   ../icons_fonts_readme/*.*
 -- @links
 --   Forum Thread       http://forum.cockos.com/showthread.php?t=169127
 --   Github repository  https://github.com/chirick86/reaperscripts
