@@ -1,15 +1,9 @@
 -- @description SubOverlay
 -- @author Chirick
--- @version 1.0.0
+-- @version 1.0.1
 -- @changelog
---   + Initial release
---   + Subtitle overlay over REAPER video window
---   + Shows current and next region/item text during playback
---   + Can be attached to video window (automatically follows it)
---   + Customizable fonts, colors, shadows
---   + Progress bar for current region/item
---   + Smart line wrapping, vertical and horizontal alignment
---   + Autostart with Prompter
+--   + Added autostart option for Prompter startup
+--   + Some minor optimizations and fixes
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -30,7 +24,6 @@
 --   * ReaImGui (install via ReaPack)
 
 --[[TODO:
--- Save commandID in ExtState
 -- check some moments in auto-wrap combined with auto-resize]]
 
 if not reaper.ImGui_CreateContext then
@@ -38,36 +31,29 @@ if not reaper.ImGui_CreateContext then
     return
 end
 
+
+
 -- Constants for ExtState control
-local CONTROL_SECTION = "ChirickSubOverlay_Control"
 local RUNNING_KEY = "running"
-local CLOSE_REQUEST_KEY = "close_request"
 local AUTOSTART_KEY = "autostart_on_prompter"
+local SETTINGS_SECTION = "ChirickSubOverlay"
+
+local _, _, _, cmdID = reaper.get_action_context()
+-- Return stable script identifier (_RS...)
+local scriptID = "_" .. reaper.ReverseNamedCommandLookup(cmdID)
+reaper.SetExtState(SETTINGS_SECTION, "scriptID", scriptID, true)  -- Store scriptID for autostart purposes
+
 
 -- Read state
-local close_req = reaper.GetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY)
-local already_running = reaper.GetExtState(CONTROL_SECTION, RUNNING_KEY)
+local already_running = reaper.GetExtState(SETTINGS_SECTION, RUNNING_KEY)
 
-if close_req == "true" then
-    -- Received close command for THIS instance - clean up and exit
-    reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
-    reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
-    return
-end
-
-if already_running == "true" then
-    -- Another instance already running - send close command and exit
-    reaper.SetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, "true", false)
-    return
-end
 
 -- Set flag that script is running
-reaper.SetExtState(CONTROL_SECTION, RUNNING_KEY, "true", false)
+reaper.SetExtState(SETTINGS_SECTION, RUNNING_KEY, "true", false)
 
 -- Register cleanup function on exit (called on any exit)
 reaper.atexit(function()
-    reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
-    reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
+    reaper.DeleteExtState(SETTINGS_SECTION, RUNNING_KEY, true)
 end)
 
 local debug_mode = false
@@ -153,7 +139,6 @@ local flags = {
 -- TRANSLATE SECTION (i18n)
 -- ========================
 local languages = {"EN", "DE", "FR", "RU", "UK"}
-local lang = "EN"
 local str = {}
 
 local i18n = {
@@ -591,8 +576,6 @@ local function load_language_strings(lang_code)
 end
 
 -- Save/load settings
-local SETTINGS_SECTION = "ChirickSubOverlay"
-
 local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "NoTitle", tostring(flags.NoTitle), true)
     reaper.SetExtState(SETTINGS_SECTION, "HideBackground", tostring(flags.HideBackground), true)
@@ -627,8 +610,8 @@ local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "attach_offset", tostring(attach_offset), true)
     reaper.SetExtState(SETTINGS_SECTION, "ignore_newlines", tostring(ignore_newlines), true)
     reaper.SetExtState(SETTINGS_SECTION, "lang", lang, true)
-    -- Store autostart in common CONTROL_SECTION for access from Prompter
-    reaper.SetExtState(CONTROL_SECTION, AUTOSTART_KEY, tostring(autostart_on_prompter), true)
+    -- Store autostart in common SETTINGS_SECTION for access from Prompter
+    reaper.SetExtState(SETTINGS_SECTION, AUTOSTART_KEY, tostring(autostart_on_prompter), true)
     -- Store window height only if video attachment is enabled
     if attach_to_video then
         reaper.SetExtState(SETTINGS_SECTION, "win_h", tostring(win_h), true)
@@ -676,10 +659,11 @@ local function load_settings()
     attach_bottom = (reaper.GetExtState(SETTINGS_SECTION, "attach_bottom") == "true")
     attach_offset = tonumber(reaper.GetExtState(SETTINGS_SECTION, "attach_offset")) or 0
     ignore_newlines = (reaper.GetExtState(SETTINGS_SECTION, "ignore_newlines") == "true")
-    lang = reaper.GetExtState(SETTINGS_SECTION, "lang") or lang
+    lang = reaper.GetExtState(SETTINGS_SECTION, "lang")
+    if lang == "" then lang = "EN" end
     load_language_strings(lang)
-    -- Load autostart from common CONTROL_SECTION
-    local autostart_str = reaper.GetExtState(CONTROL_SECTION, AUTOSTART_KEY)
+    -- Load autostart from common SETTINGS_SECTION
+    local autostart_str = reaper.GetExtState(SETTINGS_SECTION, AUTOSTART_KEY)
     autostart_on_prompter = (autostart_str == "true")
     -- Load window height only if video attachment is enabled
     if attach_to_video then
@@ -1524,20 +1508,12 @@ local function loop()
     reaper.ImGui_PopStyleVar(ctx)
     reaper.ImGui_PopFont(ctx)
     
-    -- Check for close request from external source (e.g., prompter)
-    local external_close = reaper.GetExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY)
-    if external_close == "true" then
-        close_requested = true
-        reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
-    end
-    
     local continue_running = (open ~= false) and not close_requested
     if continue_running then
         reaper.defer(loop)
     else
         -- Clear flags on close
-        reaper.DeleteExtState(CONTROL_SECTION, RUNNING_KEY, true)
-        reaper.DeleteExtState(CONTROL_SECTION, CLOSE_REQUEST_KEY, true)
+        reaper.DeleteExtState(SETTINGS_SECTION, RUNNING_KEY, true)
         close_requested = false
     end
 end

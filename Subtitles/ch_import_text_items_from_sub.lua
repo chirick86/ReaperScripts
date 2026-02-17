@@ -1,12 +1,8 @@
 -- @description Import text items from subtitles
 -- @author Chirick
--- @version 1.0.0
+-- @version 1.0.1
 -- @changelog
---   + Initial release
---   + Import subtitles to text items
---   + Supports SRT and ASS formats (multiple file selection)
---   + Auto-detects encoding (UTF-8, CP1251, CP866)
---   + For ASS files with roles - creates separate track for each role
+--   + Added text scaling
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -457,6 +453,7 @@ local function create_text_item(track, start_time, end_time, text)
         reaper.SetMediaItemPosition(item, start_time, false)
         reaper.SetMediaItemLength(item, end_time - start_time, false)
         reaper.GetSetMediaItemInfo_String(item, "P_NOTES", text, true)
+        reaper.SetMediaItemInfo_Value(item, "C_LANEDISP", 3) -- Stretch image/text
     end
 end
 

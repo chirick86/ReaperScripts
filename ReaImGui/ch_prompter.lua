@@ -1,15 +1,9 @@
 -- @description Prompter
 -- @author Chirick
--- @version 1.0.0
+-- @version 1.0.1
 -- @changelog
---   + Initial release
---   + Prompter for subtitles (regions/items) in REAPER
---   + Automatically highlights current line based on playback position
---   + Customizable fonts, colors and sizes
---   + Search functionality with highlighted results
---   + Smooth scrolling and current line magnification
---   + Autostart SubOverlay when Prompter starts (optional)
---   + Autostart Prompter with REAPER (optional)
+--   + Added autostart option for REAPER startup
+--   + Some minor optimizations and fixes
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -372,9 +366,9 @@ local STARTUP_MARKER_END = "-- [CHIRICK_PROMPTER_AUTOSTART_END]"
 
 -- get stable script identifier (and numeric ID if needed)
 local function get_script_command_id()
-    local _, _, section, cmdID = reaper.get_action_context()
+    local _, _, _, scriptID = reaper.get_action_context()
     -- Return stable script identifier (_RS...)
-    return reaper.ReverseNamedCommandLookup(cmdID), cmdID
+    return reaper.ReverseNamedCommandLookup(scriptID)
 end
 
 local function manage_startup_autostart(enable)
@@ -390,11 +384,10 @@ local function manage_startup_autostart(enable)
     
     if enable then
         -- Get stable script identifier
-        local scriptID, numID = get_script_command_id()
+        local scriptID = "_" .. get_script_command_id()
         
         -- Add the block if it doesn't exist
         if not block_start and scriptID then
-            scriptID = "_" .. scriptID  -- Ensure it has the _RS prefix
             local new_block = string.format([[
 
             -- [CHIRICK_PROMPTER_AUTOSTART_BEGIN] DO NOT EDIT THIS BLOCK
@@ -416,6 +409,21 @@ local function manage_startup_autostart(enable)
     file:write(content)
     file:close()
     return true
+end
+
+-- 🎬 Start overlay helper function
+local function start_overlay()
+    local overlay_scriptID = reaper.GetExtState("ChirickSubOverlay", "scriptID")
+    if overlay_scriptID and overlay_scriptID ~= "" then
+        reaper.Main_OnCommand(reaper.NamedCommandLookup(overlay_scriptID), 0)
+    else
+        local info = debug.getinfo(1, "S")
+        local base = (info.source:match("@?(.*[/\\])") or "")
+        local p = base .. "ch_SubOverlay.lua"
+        if reaper.file_exists(p) then
+            dofile(p)
+        end
+    end
 end
 
 -- 💾 Save/load settings
@@ -505,17 +513,12 @@ local function load_settings()
     autostart_on_reaper = read_bool("autostart_on_reaper", false)
     
     -- Autostart SubOverlay if enabled
-    local autostart_overlay = reaper.GetExtState("ChirickSubOverlay_Control", "autostart_on_prompter")
+    local autostart_overlay = reaper.GetExtState("ChirickSubOverlay", "autostart_on_prompter")
     if autostart_overlay == "true" then
-        local overlay_is_running = reaper.GetExtState("ChirickSubOverlay_Control", "running") == "true"
+        local overlay_is_running = reaper.GetExtState("ChirickSubOverlay", "running") == "true"
         if not overlay_is_running then
             -- Start SubOverlay
-            local info = debug.getinfo(1, "S")
-            local base = (info.source:match("@?(.*[\\/])") or "")
-            local p = base .. "ch_SubOverlay.lua"
-            if reaper.file_exists(p) then
-                dofile(p)
-            end
+            start_overlay()
         end
     end
 
@@ -1250,21 +1253,11 @@ local function topmenu()
 
     reaper.ImGui_SameLine(ctx, 0, 10)
     -- Check overlay status via ExtState
-    local overlay_is_running = reaper.GetExtState("ChirickSubOverlay_Control", "running") == "true"
+    local overlay_is_running = reaper.GetExtState("ChirickSubOverlay", "running") == "true"
     local overlay_button_text = overlay_is_running and str.i_overlay .. " ●" or str.i_overlay
     if reaper.ImGui_Button(ctx, overlay_button_text) then
-        if overlay_is_running then
-            -- Stop overlay - set close flag
-            reaper.SetExtState("ChirickSubOverlay_Control", "close_request", "true", false)
-        else
-            -- Start overlay
-            local info = debug.getinfo(1, "S")
-            local base = (info.source:match("@?(.*[\\/])") or "")
-            local p = base .. "ch_SubOverlay.lua"
-            if reaper.file_exists(p) then
-                dofile(p)
-            end
-        end
+        -- Toggle overlay via Main_OnCommand (REAPER handles start/stop automatically)
+        start_overlay()
     end
 
     reaper.ImGui_SameLine(ctx, 0, 10)

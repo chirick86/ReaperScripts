@@ -1,9 +1,8 @@
 -- @description Create text items from regions
 -- @author Chirick
--- @version 1.0.0
+-- @version 1.0.1
 -- @changelog
---   + Initial release
---   + Convert project regions to text items on new track
+--   + Added text scaling
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -55,6 +54,7 @@ for _, r in ipairs(regions) do
         reaper.SetMediaItemPosition(item, r.start, true)
         reaper.SetMediaItemLength(item, r.stop - r.start, true)
         reaper.GetSetMediaItemInfo_String(item, "P_NOTES", r.name, true)
+        reaper.SetMediaItemInfo_Value(item, "C_LANEDISP", 3) -- Stretch image/text
     end
 end
 
