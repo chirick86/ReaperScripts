@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="b1cec78d944dc6c36c12d1da5953cd394ed6d82d">
+<index version="1" name="chirick" commit="b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -35,6 +35,11 @@
 + Smooth scrolling and current line magnification]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_prompter.lua</source>
       </version>
+      <version name="1.0.1" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Added autostart option for REAPER startup
++ Some minor optimizations and fixes]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/ReaImGui/ch_prompter.lua</source>
+      </version>
     </reapack>
     <reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay">
       <metadata>
@@ -68,6 +73,11 @@
 + Progress bar for current region/item
 + Smart line wrapping, vertical and horizontal alignment]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/ReaImGui/ch_SubOverlay.lua</source>
+      </version>
+      <version name="1.0.1" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Added autostart option for Prompter startup
++ Some minor optimizations and fixes]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/ReaImGui/ch_SubOverlay.lua</source>
       </version>
     </reapack>
   </category>
@@ -147,6 +157,50 @@
         <changelog><![CDATA[+ Initial release
 + Convert project regions to text items on new track]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_create_text_items_from_regions.lua</source>
+      </version>
+      <version name="1.0.1" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Added text scaling]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/Subtitles/ch_create_text_items_from_regions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_delete_markers.lua" type="script" desc="Delete markers">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 This script deletes all markers in the current project.\par}
+}
+]]></description>
+        <link rel="website" href="http://forum.cockos.com/showthread.php?t=169127">Forum Thread</link>
+        <link rel="website" href="https://github.com/chirick86/reaperscripts">Github repository</link>
+        <link rel="website" href="https://www.reddit.com/r/Reaper/">Reddit thread</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+        <link rel="donation">https://ko-fi.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/Subtitles/ch_delete_markers.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_delete_regions.lua" type="script" desc="Delete regions">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 This script deletes all regions in the current project.\par}
+}
+]]></description>
+        <link rel="website" href="http://forum.cockos.com/showthread.php?t=169127">Forum Thread</link>
+        <link rel="website" href="https://github.com/chirick86/reaperscripts">Github repository</link>
+        <link rel="website" href="https://www.reddit.com/r/Reaper/">Reddit thread</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+        <link rel="donation">https://ko-fi.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/Subtitles/ch_delete_regions.lua</source>
       </version>
     </reapack>
     <reapack name="ch_export_items_to_srt.lua" type="script" desc="Export items to SRT">
@@ -289,6 +343,10 @@
 + Auto-detects encoding (UTF-8, CP1251, CP866)
 + For ASS files with roles - creates separate track for each role]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/9393595c56ff40881df6057af219acf1152ee779/Subtitles/ch_import_text_items_from_sub.lua</source>
+      </version>
+      <version name="1.0.1" author="Chirick" time="2026-02-17T16:55:21Z">
+        <changelog><![CDATA[+ Added text scaling]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/Subtitles/ch_import_text_items_from_sub.lua</source>
       </version>
     </reapack>
   </category>
