@@ -22,7 +22,6 @@
 --   * Autostart SubOverlay when Prompter starts (optional)
 --   ## Requirements
 --   * ReaImGui (install via ReaPack)
---   * JS_ReaScript Extensions (install via ReaPack)
         
 --[[TODO:
 -- Save commandID in ExtState]]
