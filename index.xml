@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="644fc47eedbe27e4f0d2f4e2544ff9db334e56bf">
+<index version="1" name="chirick" commit="3daeb0f8cba5901ff4e61af0ae7fb15586c74edb">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -19,8 +19,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smooth scrolling and current line magnification\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Autostart SubOverlay when Prompter starts (optional)\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JS_ReaScript Extensions (install via ReaPack)\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (install via ReaPack)\sa180\par}
 }
 ]]></description>
         <link rel="website">https://github.com/chirick86/reaperscripts</link>
