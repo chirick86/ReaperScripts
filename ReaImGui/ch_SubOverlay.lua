@@ -1,9 +1,8 @@
 -- @description SubOverlay
 -- @author Chirick
--- @version 1.0.1
+-- @version 1.0.2
 -- @changelog
---   + Added autostart option for Prompter startup
---   + Some minor optimizations and fixes
+--   + Deprecated function reaper.ULT_GetMediaItemNote() replaced with reaper.GetSetMediaItemInfo_String()
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -693,7 +692,7 @@ local function collect_source_modes()
             local it = reaper.GetTrackMediaItem(tr, i)
             local take = reaper.GetActiveTake(it)
             if not (take and reaper.ValidatePtr(take, "MediaItem_Take*")) then
-                local notes = reaper.ULT_GetMediaItemNote(it)
+                local _, notes = reaper.GetSetMediaItemInfo_String(it, "P_NOTES", "", false)
                 if notes and notes ~= "" then
                     has_text = true
                     break
@@ -1108,7 +1107,7 @@ local function get_text_item_name(item)
     if take and reaper.ValidatePtr(take, "MediaItem_Take*") then
         return nil
     end
-    local notes = reaper.ULT_GetMediaItemNote(item)
+    local _, notes = reaper.GetSetMediaItemInfo_String(item, "P_NOTES", "", false)
     if notes and notes ~= "" then
         if ignore_newlines then notes = string.gsub(notes, "\n", " ") end
         return notes
