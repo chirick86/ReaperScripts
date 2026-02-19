@@ -521,10 +521,9 @@ local function import_subs_multi()
             paths = split_paths(sel)
         end
     else
-        -- Fallback: позволим выбирать файлы по очереди до отмены
-        while true do
-            local retval, file_path = reaper.GetUserFileNameForRead("", "Select subtitle file (Cancel to finish)", "srt;ass;xml;csv;SRT;ASS;XML;CSV")
-            if not retval or not file_path or file_path == "" then break end
+        -- Fallback без JS_Extensions: выбираем один файл за запуск скрипта
+        local retval, file_path = reaper.GetUserFileNameForRead("", "Select subtitle file", "srt;ass;xml;csv;SRT;ASS;XML;CSV")
+        if retval and file_path and file_path ~= "" then
             table.insert(paths, file_path)
         end
     end
