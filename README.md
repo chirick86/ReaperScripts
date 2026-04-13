@@ -1,165 +1,86 @@
-# Chirick Subtitle Scripts
+# Chirick's Subtitle Scripts
 
-A comprehensive collection of scripts for working with subtitles in REAPER.
+Scripts for REAPER to work with subtitles and voiceover for video content — import, export, visualization, and real-time display.
 
-![REAPER](https://img.shields.io/badge/REAPER-6.0+-blue?style=flat-square)
+[![REAPER](https://img.shields.io/badge/REAPER-6.0+-blue?style=flat-square)](https://forum.cockos.com/showthread.php?p=2935723)
+[![Reddit](https://img.shields.io/badge/Reddit-Discussion-orange?style=flat-square)](https://www.reddit.com/r/Reaper/comments/1skaa8e/chiricks_subtitle_scripts_subtitle_voiceover/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![Patreon](https://img.shields.io/badge/Support-Patreon-orange?style=flat-square)](https://patreon.com/chirick)
 [![Ko-fi](https://img.shields.io/badge/Support-Ko--fi-red?style=flat-square)](https://ko-fi.com/chirick)
+[![YouTube](https://img.shields.io/badge/YouTube-Channel-red?style=flat-square)](https://youtu.be/sM-Q4fyQ2ds)
 
-## 📦 Packages
+## 📺 Video Presentation
 
-This repository contains two package categories:
+<a href="https://youtu.be/sM-Q4fyQ2ds">
+  <img src="https://i.ytimg.com/vi/sM-Q4fyQ2ds/hqdefault.jpg" alt="Chirick Subtitle Scripts — Presentation" width="100%" style="max-width:600px" />
+</a>
 
-### 🎬 Subtitle Scripts
-Core subtitle tools for import, export, and conversion operations. No additional dependencies required.
+## ⚡ Installation
 
-- **Import text items from subtitles** - Import SRT/ASS subtitles as text items
-- **Import regions from subtitles** - Import SRT/ASS subtitles as project regions  
-- **Export items to SRT** - Export text items from selected track to SRT file
-- **Export regions to SRT** - Export project regions to SRT file
-- **Create text items from regions** - Convert project regions to text items on new track
-- **Create regions from text items** - Convert text items on selected track to project regions
-- **Convert SWS subtitles to regions** - Convert SWS S&M subtitles to full timeline regions
+1. Install [ReaPack](https://reapack.com/)
+2. In REAPER: **Extensions → ReaPack → Import repositories...**
+3. Paste the URL and click OK:
 
-### 🖥️ Subtitle ReaImGui Scripts *(Advanced GUI tools)*
-Real-time subtitle tools with graphical interface.
-
-- **Prompter** - Prompter with automatic synchronization
-- **SubOverlay** - Subtitle overlay over REAPER video window
-
-> ⚠️ Requires [ReaImGui](https://github.com/cfillion/reaimgui) (install via ReaPack)
-
-## ⚡ Quick Start
-
-### Installation via ReaPack (Recommended)
-
-1. Install [ReaPack](https://reapack.com/) if you haven't already
-2. In REAPER: **Extensions** → **ReaPack** → **Import repositories...**
-3. Paste this URL and click OK:
    ```
    https://github.com/chirick86/ReaperScripts/raw/master/index.xml
    ```
-4. Go to **Extensions** → **ReaPack** → **Browse packages**
-5. Search for "Chirick" and install the packages you need
 
-### Manual Installation
-
-1. Download last realese from the [Releases]
-2. Copy the `chirick` folder to your REAPER Scripts folder:
-   - **Windows:** `%APPDATA%\REAPER\Scripts\`
-   - **macOS:** `~/Library/Application Support/REAPER/Scripts/`
-   - **Linux:** `~/.config/REAPER/Scripts/`
-3. In REAPER: **Actions** → **Show action list** → **New action** → **Load ReaScript...**
-4. Navigate to the `Subtitles` folder and select the scripts you want to use
+4. **Extensions → ReaPack → Browse packages** → search "Chirick"
 
 ## 🎯 Typical Usage Scenario
 
-1. **Import:** Use "Import text items from subtitles" to import an SRT/ASS file
-2. **Display:** Open "Prompter" for comfortable reading during recording
-3. **Overlay:** Run "SubOverlay" to display text over video in real-time
+1. **Import** subtitles from SRT/ASS file as text items or regions
+2. **Prompter** — read the script during voiceover recording
+3. **SubOverlay** — display subtitle text over the video in real-time
+4. **Export** the finished layout back to SRT
+
+## 📦 Scripts
+
+### 🎬 Subtitle Scripts
+
+No additional dependencies required.
+
+| Script | Description |
+|--------|-------------|
+| **Import text items from subtitles** | Imports SRT/ASS as text items. Each item's timing and text match the subtitle. For ASS with roles — separate track per role |
+| **Import regions from subtitles** | Imports SRT/ASS as project regions. For ASS with roles — unique color per role |
+| **Export items to SRT** | Exports all items from the selected track to SRT. Text is taken from item Notes |
+| **Export regions to SRT** | Exports all project regions to SRT. Region names become subtitle text |
+| **Create text items from regions** | Converts project regions into text items on a new track. Region names → item Notes |
+| **Create regions from text items** | Converts text items on the selected track into project regions. Item Notes → region names |
+| **Convert SWS subtitles to regions** | Converts SWS S&M subtitle markers into full project regions. ⚠️ Save the project before running |
+| **Delete markers** | Deletes all markers in the current project |
+| **Delete regions** | Deletes all regions in the current project |
+| **Icons and fonts** | Installs toolbar icons and fonts for the subtitle scripts |
+
+### 🖥️ ReaImGui Scripts
+
+Real-time GUI tools. Require [ReaImGui](https://github.com/cfillion/reaimgui) (install via ReaPack).
+
+| Script | Description |
+|--------|-------------|
+| **Prompter** | Script/teleprompter panel — shows regions or text items as a scrollable list, highlights the current line during playback, supports click-to-jump navigation, search, and combined regions+items view. Can auto-launch SubOverlay on start. **Requires:** ReaImGui + JS_ReaScript Extensions |
+| **SubOverlay** | Subtitle overlay on the REAPER video window — shows current and next line during playback. Attaches to and follows the video window. Supports transparent background, progress bar, font/color/shadow customization, and "fill gaps" mode. **Requires:** ReaImGui |
 
 ## ✨ Key Features
 
-### Import & Export
-✅ **Multiple encodings support** – UTF-8, CP1251, CP866  
-✅ **ASS format support** – Automatic role separation with unique colors  
-✅ **Batch processing** – Multiple file import with format auto-detection  
-✅ **Instant import** – No waiting while items are being placed  
-✅ **Flexible handling** – Empty lines allowed, lines can start with numbers  
-✅ **First region preserved** – First region line doesn't disappear  
-
-### Display & Visualization
-✅ **Special characters** – Accents and special symbols display correctly  
-✅ **Flexible display modes** – Switch between regions, items, or combined view  
-✅ **Smart filtering** – Muted tracks automatically excluded from Prompter  
-✅ **Project memory** – Prompter remembers selected display mode for each project  
-
-### Advanced GUI Features (ReaImGui)
-✅ **Full customization** – Fonts, colors, sizes for each element  
-✅ **Video window attachment** – SubOverlay follows REAPER video window  
-✅ **Responsive overlay** – Automatically hides when REAPER is inactive or minimized  
-✅ **Multi-track support** – Flexible track switching and display options  
+✅ **SRT and ASS formats** — with auto-encoding detection (UTF-8, CP1251, CP866)  
+✅ **ASS role separation** — separate tracks or unique colors per character  
+✅ **Batch import** — multiple files at once with format auto-detection  
+✅ **Bidirectional conversion** — regions ↔ text items  
+✅ **Real-time display** — Prompter and SubOverlay sync with playback position  
+✅ **Fully customizable UI** — fonts, colors, sizes, transparency for each element  
+✅ **Video window integration** — SubOverlay follows the REAPER video window  
 
 ## 📋 Requirements
 
-- **REAPER** 6.0 or later
-- **ReaPack** (for installation and auto-updates)
-- **ReaImGui** (for Prompter and SubOverlay – install via ReaPack)
-- **JS_ReaScript Extensions** (for Prompter – install via ReaPack)
+| Component | Required for |
+|-----------|-------------|
+| REAPER 6.0+ | All scripts |
+| ReaPack | Installation and updates |
+| ReaImGui | Prompter, SubOverlay |
+| JS_ReaScript Extensions | Prompter |
 
-## Scripts Structure
+## 🎨 Icons & Fonts
 
-### Export Scripts
-- **Export items to SRT** - Export text items from selected track to SRT file
-  - Text is taken from item Notes
-  - Standard SRT format with timecodes
-  
-- **Export regions to SRT** - Export project regions to SRT file
-  - Region names become subtitle text
-  - Quick way to create subtitles from project marking
-
-### Conversion Scripts
-- **Create text items from regions** - Convert project regions to text items
-  - Creates new track automatically
-  - Region names transferred to item Notes
-  - Timing matches perfectly
-  
-- **Create regions from text items** - Convert text items to project regions
-  - Select a track with items
-  - Item Notes transferred to region names
-  - Useful for timeline marking
-
-- **Convert SWS subtitles to regions** - Convert SWS S&M subtitles to full timeline regions
-  - Reads currently open (saved) project .rpp file
-  - Extracts subtitle data and creates full regions
-  - **Note:** Backup project before running!
-
-### Subtitle ReaImGui Scripts
-
-Advanced GUI tools for working with subtitles. **Requires ReaImGui** (install via ReaPack).
-
-#### Install ReaImGui
-
-1. **Extensions** → **ReaPack** → **Browse packages**
-2. Search for "ReaImGui"
-3. Right-click on **ReaImGui: ReaScript binding for Dear ImGui**
-4. Click **Install** → **Apply**
-
-#### Scripts
-
-- **Prompter** - Prompter for subtitles
-  - Shows regions or text items as scrollable list
-  - Automatically highlights current line during playback
-  - Click on line to jump to position (+ copies text to clipboard)
-  - Customizable fonts, colors, and sizes for regions and items separately
-  - Search with highlighted results
-  - "All elements" mode - combines regions and items in timeline order
-  - Smooth scrolling and current line magnification
-  - Muted track items are excluded from display
-  - Remembers selected display mode for each project
-  - **Requires:** ReaImGui + JS_ReaScript Extensions
-
-- **SubOverlay** - Subtitle overlay over video
-  - Shows current and next region/item text during playback
-  - Can be attached to REAPER video window (automatically follows it)
-  - Customizable fonts, colors, shadows for each line
-  - Progress bar shows current region/item progress
-  - Smart line wrapping, vertical and horizontal alignment
-  - Transparent background, hide title bar for minimalist display
-  - "Fill gaps" mode - shows nearest text even between regions
-  - Only visible when REAPER is active or maximized
-  - **Requires:** ReaImGui
-
-## Resources
-
-The `icons_fonts_readme` folder contains additional resources:
-- Toolbar icons for scripts
-- Font recommendations
-- Detailed documentation (Readme.txt)
-
-To use toolbar icons:
-1. Copy icons to `REAPER\Data\toolbar_icons` folder
-2. Add scripts to toolbar
-3. Right-click on toolbar button → Set button icon
-
+The `icons_fonts_readme` folder contains toolbar icons and font recommendations. After installation via ReaPack — copy icons to `REAPER\Data\toolbar_icons` and assign them via right-click on the toolbar button.
