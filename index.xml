@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="3daeb0f8cba5901ff4e61af0ae7fb15586c74edb">
+<index version="1" name="chirick" commit="cb78117dec959db91d2923ccc5d26c3242065f33">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -81,6 +81,48 @@
       <version name="1.0.2" author="Chirick" time="2026-02-19T11:28:06Z">
         <changelog><![CDATA[+ Deprecated function reaper.ULT_GetMediaItemNote() replaced with reaper.GetSetMediaItemInfo_String()]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/644fc47eedbe27e4f0d2f4e2544ff9db334e56bf/ReaImGui/ch_SubOverlay.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Reaper">
+    <reapack name="ch_BPMSwitcher.lua" type="script" desc="Switch BPM to 120/240/360">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 BPM Switcher\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Switch BPM to 120/240/360\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Usage\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Just run the script from Actions\par}
+}
+]]></description>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-08-15T17:04:22Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/cb78117dec959db91d2923ccc5d26c3242065f33/Reaper/ch_BPMSwitcher.lua</source>
+      </version>
+    </reapack>
+    <reapack name="ch_set_bpm.lua" type="script" desc="Set BPM">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 SET BPM\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Set BPM to a specific value\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Usage\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Just run the script from Actions Type new BPM value in the prompt\par}
+}
+]]></description>
+        <link rel="website">https://github.com/chirick86/reaperscripts</link>
+        <link rel="donation">https://patreon.com/chirick</link>
+      </metadata>
+      <version name="1.0.0" author="Chirick" time="2026-08-15T17:04:22Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/cb78117dec959db91d2923ccc5d26c3242065f33/Reaper/ch_set_bpm.lua</source>
       </version>
     </reapack>
   </category>
