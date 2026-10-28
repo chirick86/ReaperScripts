@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="cb78117dec959db91d2923ccc5d26c3242065f33">
+<index version="1" name="chirick" commit="d4321913f55c4b4c10560225df124e25ef417118">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -38,6 +38,13 @@
         <changelog><![CDATA[+ Added autostart option for REAPER startup
 + Some minor optimizations and fixes]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/b99c6844e5c0e8e43cf8fba201f03f10a07ea2c3/ReaImGui/ch_prompter.lua</source>
+      </version>
+      <version name="26.10.28" author="Chirick" time="2026-10-28T14:42:57Z">
+        <changelog><![CDATA[+ Font selection from fonts installed in the system (scanned once at startup)
++ Font filter in font selection combo
++ Fonts are saved by name instead of index
++ Fixed time column width not recalculated after reloading subtitles longer than 1 hour]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/d4321913f55c4b4c10560225df124e25ef417118/ReaImGui/ch_prompter.lua</source>
       </version>
     </reapack>
     <reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay">
@@ -81,6 +88,12 @@
       <version name="1.0.2" author="Chirick" time="2026-02-19T11:28:06Z">
         <changelog><![CDATA[+ Deprecated function reaper.ULT_GetMediaItemNote() replaced with reaper.GetSetMediaItemInfo_String()]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/644fc47eedbe27e4f0d2f4e2544ff9db334e56bf/ReaImGui/ch_SubOverlay.lua</source>
+      </version>
+      <version name="26.10.28" author="Chirick" time="2026-10-28T14:42:57Z">
+        <changelog><![CDATA[+ Font selection from fonts installed in the system (scanned once at startup)
++ Font filter in font selection combo
++ Fonts are saved by name instead of index]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/d4321913f55c4b4c10560225df124e25ef417118/ReaImGui/ch_SubOverlay.lua</source>
       </version>
     </reapack>
   </category>
