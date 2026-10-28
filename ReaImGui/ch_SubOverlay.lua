@@ -1,8 +1,10 @@
 -- @description SubOverlay
 -- @author Chirick
--- @version 1.0.2
+-- @version 26.10.28
 -- @changelog
---   + Deprecated function reaper.ULT_GetMediaItemNote() replaced with reaper.GetSetMediaItemInfo_String()
+--   + Font selection from fonts installed in the system (scanned once at startup)
+--   + Font filter in font selection combo
+--   + Fonts are saved by name instead of index
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -56,6 +58,7 @@ reaper.atexit(function()
 end)
 
 local debug_mode = false
+local VERSION = "26.10.28"
 local ctx = reaper.ImGui_CreateContext("Sub Overlay")
 local win_X, win_Y, win_w, win_h = 500, 500, 500, 300
 local win_open = true
@@ -74,20 +77,201 @@ local show_wrap_guides = false          -- flag to show wrap guide lines
 
 
 -- Font and scale settings
-local BASE_FONT_SIZE = 14               -- base font size for creating font objects
-local available_fonts = {
+-- Fallback list: used when the system font scan finds nothing,
+-- and to migrate old index-based settings (current_font_index / second_font_index)
+local DEFAULT_FONT_NAMES = {
     "Arial","Calibri","Roboto","Segoe UI","Tahoma","Verdana",
     "Cambria","CooperMediumC BT","Georgia","Times New Roman",
     "Consolas","Courier New"
 }
-local font_objects = {}
-for i, name in ipairs(available_fonts) do
-    local f = reaper.ImGui_CreateFont(name, BASE_FONT_SIZE)
-    font_objects[i] = f
-    reaper.ImGui_Attach(ctx, f)
+local FONT_EXTENSIONS = { ttf = true, otf = true, ttc = true, otc = true }
+
+local function u16(s, p)
+    local a, b = s:byte(p, p + 1)
+    return a * 256 + b
 end
 
-local ui_font = font_objects[1]         -- first font always for UI
+local function u32(s, p)
+    local a, b, c, d = s:byte(p, p + 3)
+    return ((a * 256 + b) * 256 + c) * 256 + d
+end
+
+local function utf16be_to_utf8(s)
+    local out = {}
+    local i, n = 1, #s - 1
+    while i <= n do
+        local c = u16(s, i)
+        i = i + 2
+        -- surrogate pair
+        if c >= 0xD800 and c <= 0xDBFF and i <= n then
+            local c2 = u16(s, i)
+            i = i + 2
+            c = 0x10000 + (c - 0xD800) * 0x400 + (c2 - 0xDC00)
+        end
+        out[#out+1] = utf8.char(c)
+    end
+    return table.concat(out)
+end
+
+-- Read font family name (nameID 1) of a TrueType/OpenType font starting at 'base' offset
+local function read_font_family(f, base)
+    f:seek("set", base)
+    local hdr = f:read(12)
+    if not hdr or #hdr < 12 then return nil end
+    local num_tables = u16(hdr, 5)
+    local dir = f:read(num_tables * 16)
+    if not dir or #dir < num_tables * 16 then return nil end
+
+    local name_off, name_len
+    for t = 0, num_tables - 1 do
+        local p = t * 16 + 1
+        if dir:sub(p, p + 3) == "name" then
+            name_off, name_len = u32(dir, p + 8), u32(dir, p + 12)
+            break
+        end
+    end
+    if not name_off then return nil end
+
+    f:seek("set", name_off)
+    local nt = f:read(name_len)
+    if not nt or #nt < 6 then return nil end
+    local count, str_off = u16(nt, 3), u16(nt, 5)
+
+    -- Priority: Windows/English(US) > Windows/any language > Mac Roman
+    local best, best_rank
+    for r = 0, count - 1 do
+        local p = 7 + r * 12
+        if p + 11 > #nt then break end
+        local platform, encoding, language, name_id = u16(nt, p), u16(nt, p + 2), u16(nt, p + 4), u16(nt, p + 6)
+        if name_id == 1 then
+            local rank
+            if platform == 3 and language == 0x0409 then rank = 1
+            elseif platform == 3 then rank = 2
+            elseif platform == 1 and encoding == 0 then rank = 3
+            end
+            if rank and (not best_rank or rank < best_rank) then
+                local len, off = u16(nt, p + 8), u16(nt, p + 10)
+                local s = nt:sub(str_off + off + 1, str_off + off + len)
+                if platform == 3 then s = utf16be_to_utf8(s) end
+                if utf8.len(s) then
+                    best, best_rank = s, rank
+                    if rank == 1 then break end
+                end
+            end
+        end
+    end
+    return best
+end
+
+-- Read all family names from a font file (.ttc/.otc collections may contain several fonts)
+local function read_font_file(path, out)
+    local f = io.open(path, "rb")
+    if not f then return end
+    local offsets = {}
+    local tag = f:read(4)
+    if tag == "ttcf" then
+        local h = f:read(8)  -- version + numFonts
+        if h and #h == 8 then
+            local n = math.min(u32(h, 5), 64)
+            local d = f:read(n * 4)
+            if d and #d == n * 4 then
+                for k = 0, n - 1 do offsets[#offsets+1] = u32(d, k * 4 + 1) end
+            end
+        end
+    elseif tag and #tag == 4 then
+        offsets[1] = 0
+    end
+    for _, off in ipairs(offsets) do
+        local ok, name = pcall(read_font_family, f, off)
+        if ok and name then out[#out+1] = name end
+    end
+    f:close()
+end
+
+local function scan_font_dir(dir, sep, out, depth)
+    local i = 0
+    while true do
+        local file = reaper.EnumerateFiles(dir, i)
+        if not file then break end
+        local ext = file:match("%.(%w+)$")
+        if ext and FONT_EXTENSIONS[ext:lower()] then
+            read_font_file(dir .. sep .. file, out)
+        end
+        i = i + 1
+    end
+    if depth > 0 then
+        i = 0
+        while true do
+            local sub = reaper.EnumerateSubdirectories(dir, i)
+            if not sub then break end
+            scan_font_dir(dir .. sep .. sub, sep, out, depth - 1)
+            i = i + 1
+        end
+    end
+end
+
+-- Collect font families installed in the system (called once at startup)
+local function collect_system_fonts()
+    local os_name = reaper.GetOS()
+    local home = os.getenv("HOME") or ""
+    local dirs, sep
+    if os_name:match("^Win") then
+        sep = "\\"
+        dirs = { (os.getenv("WINDIR") or "C:\\Windows") .. "\\Fonts" }
+        local local_appdata = os.getenv("LOCALAPPDATA")
+        if local_appdata then
+            dirs[#dirs+1] = local_appdata .. "\\Microsoft\\Windows\\Fonts"  -- per-user fonts
+        end
+    elseif os_name:match("^OSX") or os_name:match("^macOS") then
+        sep = "/"
+        dirs = { "/System/Library/Fonts", "/Library/Fonts", home .. "/Library/Fonts" }
+    else
+        sep = "/"
+        dirs = { "/usr/share/fonts", "/usr/local/share/fonts", home .. "/.fonts", home .. "/.local/share/fonts" }
+    end
+
+    local raw = {}
+    for _, dir in ipairs(dirs) do
+        scan_font_dir(dir, sep, raw, 3)
+    end
+
+    local names, seen = {}, {}
+    for _, name in ipairs(raw) do
+        name = name:gsub("%z", ""):match("^%s*(.-)%s*$")
+        local key = name:lower()
+        -- skip vertical-writing variants (@Font) and duplicates (Bold/Italic files share a family)
+        if name ~= "" and name:sub(1, 1) ~= "@" and not seen[key] then
+            seen[key] = true
+            names[#names+1] = name
+        end
+    end
+    table.sort(names, function(a, b) return a:lower() < b:lower() end)
+
+    if #names == 0 then
+        for i, name in ipairs(DEFAULT_FONT_NAMES) do names[i] = name end
+    end
+    return names
+end
+
+local available_fonts = collect_system_fonts()
+local available_fonts_lower = {}        -- name lowercased -> name as listed (for lookup of saved fonts)
+for _, name in ipairs(available_fonts) do available_fonts_lower[name:lower()] = name end
+
+-- Font objects are created lazily (only for fonts actually in use)
+local font_cache = {}
+local fonts_dirty = false               -- font selection changed, objects must be refreshed before the next frame
+
+local function get_font(name)
+    local f = font_cache[name]
+    if not f then
+        f = reaper.ImGui_CreateFont(name)
+        reaper.ImGui_Attach(ctx, f)
+        font_cache[name] = f
+    end
+    return f
+end
+
+local ui_font = get_font(DEFAULT_FONT_NAMES[1]) -- first default font always for UI
 local UI_FONT_SCALE = 14                -- fixed scale for interface
 local CONTEXT_MENU_MIN_WIDTH = 100      -- minimum context menu width
 local next_region_offset = 20           -- offset between current and next region
@@ -97,11 +281,13 @@ local progress_height = 4               -- default height
 local progress_offset = 20              -- offset from first line
 local padding_x = 6                     -- padding for background under text
 local padding_y = 3                     -- padding for background under text
-local current_font_index = 1            -- font index
+local current_font_name = DEFAULT_FONT_NAMES[1] -- font name
+local current_font = ui_font            -- font object
 local font_scale = 30                   -- font size
 local text_color   = 0xFFBB00FF         -- text color
 local shadow_color = 0x000000FF         -- shadow color
-local second_font_index = 1             -- font index for second line
+local second_font_name = DEFAULT_FONT_NAMES[1] -- font name for second line
+local second_font = ui_font             -- font object for second line
 local second_font_scale = 22            -- second line size
 local second_text_color = 0x99BB22FF    -- second line color
 local second_shadow_color = 0x000000FF  -- second line shadow color
@@ -574,6 +760,13 @@ local function load_language_strings(lang_code)
     str.b_close = trans.b_close
 end
 
+-- Must be called outside of ImGui frame (fonts get attached to the context here)
+local function refresh_fonts()
+    current_font = get_font(current_font_name)
+    second_font  = get_font(second_font_name)
+    fonts_dirty = false
+end
+
 -- Save/load settings
 local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "NoTitle", tostring(flags.NoTitle), true)
@@ -582,11 +775,11 @@ local function save_settings()
     reaper.SetExtState(SETTINGS_SECTION, "AlwaysAutoResize", tostring(flags.AlwaysAutoResize), true)
     reaper.SetExtState(SETTINGS_SECTION, "NoMove", tostring(flags.NoMove), true)
     reaper.SetExtState(SETTINGS_SECTION, "NoDocking", tostring(flags.NoDocking), true)  
-    reaper.SetExtState(SETTINGS_SECTION, "current_font_index", tostring(current_font_index), true)
+    reaper.SetExtState(SETTINGS_SECTION, "current_font_name", current_font_name, true)
     reaper.SetExtState(SETTINGS_SECTION, "font_scale", tostring(font_scale), true)
     reaper.SetExtState(SETTINGS_SECTION, "text_color", string.format("%08X", text_color), true)
     reaper.SetExtState(SETTINGS_SECTION, "shadow_color", string.format("%08X", shadow_color), true)
-    reaper.SetExtState(SETTINGS_SECTION, "second_font_index", tostring(second_font_index), true)
+    reaper.SetExtState(SETTINGS_SECTION, "second_font_name", second_font_name, true)
     reaper.SetExtState(SETTINGS_SECTION, "second_font_scale", tostring(second_font_scale), true)
     reaper.SetExtState(SETTINGS_SECTION, "next_region_offset", tostring(next_region_offset), true)
     reaper.SetExtState(SETTINGS_SECTION, "second_text_color", string.format("%08X", second_text_color), true)
@@ -627,9 +820,20 @@ local function load_settings()
     flags.AlwaysAutoResize = reaper.GetExtState(SETTINGS_SECTION, "AlwaysAutoResize") == "true"
     flags.NoMove = reaper.GetExtState(SETTINGS_SECTION, "NoMove") == "true"
     flags.NoDocking = reaper.GetExtState(SETTINGS_SECTION, "NoDocking") == "true"
-    current_font_index = tonumber(reaper.GetExtState(SETTINGS_SECTION, "current_font_index")) or 1
+    -- Font is stored by name; old settings stored an index in DEFAULT_FONT_NAMES
+    local function read_font_name(prefix, fallback)
+        local v = reaper.GetExtState(SETTINGS_SECTION, prefix .. "_name")
+        if v == "" then
+            local old_idx = tonumber(reaper.GetExtState(SETTINGS_SECTION, prefix .. "_index"))
+            v = old_idx and DEFAULT_FONT_NAMES[old_idx] or ""
+        end
+        -- Font is not installed anymore - use fallback
+        return available_fonts_lower[v:lower()] or fallback
+    end
+    current_font_name = read_font_name("current_font", DEFAULT_FONT_NAMES[1])
     font_scale = tonumber(reaper.GetExtState(SETTINGS_SECTION, "font_scale")) or 30
-    second_font_index = tonumber(reaper.GetExtState(SETTINGS_SECTION, "second_font_index")) or 1
+    second_font_name = read_font_name("second_font", DEFAULT_FONT_NAMES[1])
+    refresh_fonts()
     second_font_scale = tonumber(reaper.GetExtState(SETTINGS_SECTION, "second_font_scale")) or 30
     next_region_offset = tonumber(reaper.GetExtState(SETTINGS_SECTION, "next_region_offset")) or 40
     local txt_col = reaper.GetExtState(SETTINGS_SECTION, "text_color")
@@ -754,6 +958,38 @@ local function tooltip(text)
 end
 
 -- Context menu
+-- Font selection combo with filter. Returns changed, font name
+local font_filter = ""
+local function font_combo(label, current_name)
+    local changed, result = false, current_name
+    if reaper.ImGui_BeginCombo(ctx, label, current_name, reaper.ImGui_ComboFlags_HeightLarge()) then
+        local appearing = reaper.ImGui_IsWindowAppearing(ctx)
+        if appearing then
+            font_filter = ""
+            reaper.ImGui_SetKeyboardFocusHere(ctx)
+        end
+        local _, new_filter = reaper.ImGui_InputText(ctx, "🔎##font_filter", font_filter)
+        font_filter = new_filter
+        local filter_lower = font_filter:lower()
+
+        for _, name in ipairs(available_fonts) do
+            if filter_lower == "" or name:lower():find(filter_lower, 1, true) then
+                local selected = (name == current_name)
+                if reaper.ImGui_Selectable(ctx, name, selected) then
+                    result = name
+                    fonts_dirty = true  -- font object will be created before the next frame
+                    changed = true
+                end
+                if selected and appearing then
+                    reaper.ImGui_SetScrollHereY(ctx)
+                end
+            end
+        end
+        reaper.ImGui_EndCombo(ctx)
+    end
+    return changed, result
+end
+
 local function draw_context_menu()
     if reaper.ImGui_BeginPopup(ctx, "context_menu",
         reaper.ImGui_WindowFlags_NoResize() | reaper.ImGui_WindowFlags_NoSavedSettings()) then
@@ -854,15 +1090,7 @@ local function draw_context_menu()
         -- First line styling
         reaper.ImGui_Separator(ctx)
         reaper.ImGui_Text(ctx, str.h_first_line)
-        if reaper.ImGui_BeginCombo(ctx, str.c_font, available_fonts[current_font_index]) then
-            for i, name in ipairs(available_fonts) do
-                if reaper.ImGui_Selectable(ctx, name, i == current_font_index) then
-                    current_font_index = i
-                    changes = 1
-                end
-            end
-            reaper.ImGui_EndCombo(ctx)
-        end
+        current_font_name = add_change(font_combo(str.c_font, current_font_name))
         font_scale      = add_change(reaper.ImGui_SliderInt(ctx, str.c_scale, font_scale, 10, 100))
         text_color      = add_change(reaper.ImGui_ColorEdit4(ctx, str.c_color, text_color, reaper.ImGui_ColorEditFlags_NoInputs() | reaper.ImGui_ColorEditFlags_AlphaBar()))
         shadow_color    = add_change(reaper.ImGui_ColorEdit4(ctx, str.c_shadow, shadow_color, reaper.ImGui_ColorEditFlags_NoInputs() | reaper.ImGui_ColorEditFlags_AlphaBar()))
@@ -882,15 +1110,7 @@ local function draw_context_menu()
         enable_second_line = add_change(reaper.ImGui_Checkbox(ctx, str.c_second_line, enable_second_line))
         tooltip(str.t_second_line)
         if enable_second_line then
-            if reaper.ImGui_BeginCombo(ctx, str.c_font2, available_fonts[second_font_index]) then
-                for i, name in ipairs(available_fonts) do
-                    if reaper.ImGui_Selectable(ctx, name, i == second_font_index) then
-                        second_font_index = i
-                        changes = 1
-                    end
-                end
-                reaper.ImGui_EndCombo(ctx)
-            end
+            second_font_name = add_change(font_combo(str.c_font2, second_font_name))
             second_font_scale   = add_change(reaper.ImGui_SliderInt(ctx, str.c_scale2, second_font_scale, 10, 100))
             next_region_offset  = add_change(reaper.ImGui_SliderInt(ctx, str.c_offset2, next_region_offset, 0, 200))
             second_text_color   = add_change(reaper.ImGui_ColorEdit4(ctx, str.c_color2, second_text_color, reaper.ImGui_ColorEditFlags_NoInputs() | reaper.ImGui_ColorEditFlags_AlphaBar()))
@@ -914,6 +1134,8 @@ local function draw_context_menu()
             close_requested = true
             reaper.ImGui_CloseCurrentPopup(ctx)
         end
+        reaper.ImGui_SameLine(ctx)
+        reaper.ImGui_TextDisabled(ctx, "ver. " .. VERSION)
 
         reaper.ImGui_PopItemWidth(ctx)
         reaper.ImGui_EndPopup(ctx)
@@ -984,9 +1206,8 @@ local function balanced_wrap(ctx, text, max_w)
 end
 
 -- Function to draw centered text
-local function draw_centered_text(ctx, text, font_index, font_scale, text_color, shadow_color, win_w)
-    local font_to_push = font_objects[font_index] or font_objects[1]
-    reaper.ImGui_PushFont(ctx, font_to_push, font_scale)
+local function draw_centered_text(ctx, text, font, font_scale, text_color, shadow_color, win_w)
+    reaper.ImGui_PushFont(ctx, font, font_scale)
 
     local lines = {}
     for line in string.gmatch(text .. "\n", "(.-)\n") do
@@ -1301,6 +1522,9 @@ end
 -- Rest of main loop
 -- =========================
 local function loop()
+    -- Apply font selected in the context menu (before any ImGui call of this frame)
+    if fonts_dirty then refresh_fonts() end
+
     reaper.ImGui_PushFont(ctx, ui_font, UI_FONT_SCALE)
     reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowBorderSize(), 0)
     reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), window_bg_color)
@@ -1401,7 +1625,7 @@ local function loop()
             local total_height = 0
             
             -- First line height
-            reaper.ImGui_PushFont(ctx, font_objects[current_font_index] or font_objects[1], font_scale)
+            reaper.ImGui_PushFont(ctx, current_font, font_scale)
             local calc_width = win_w - padding_x*2 - wrap_margin*2
             local _, first_line_height = reaper.ImGui_CalcTextSize(ctx, current or " ", 0, 0, false, calc_width)
             reaper.ImGui_PopFont(ctx)
@@ -1414,7 +1638,7 @@ local function loop()
             
             -- Second line height (if enabled)
             if enable_second_line then
-                reaper.ImGui_PushFont(ctx, font_objects[second_font_index] or font_objects[1], second_font_scale)
+                reaper.ImGui_PushFont(ctx, second_font, second_font_scale)
                 local _, second_line_height = reaper.ImGui_CalcTextSize(ctx, nextreg or " ", 0, 0, false, calc_width)
                 reaper.ImGui_PopFont(ctx)
                 total_height = total_height + next_region_offset + second_line_height
@@ -1426,7 +1650,7 @@ local function loop()
         end
         
         -- draw text
-        draw_centered_text(ctx, current, current_font_index, font_scale, text_color, shadow_color, win_w) -- first line
+        draw_centered_text(ctx, current, current_font, font_scale, text_color, shadow_color, win_w) -- first line
 
         -- progress bar
         if show_progress then
@@ -1448,7 +1672,7 @@ local function loop()
         if enable_second_line then -- check if second line is enabled
             local cur_y = reaper.ImGui_GetCursorPosY(ctx)
             reaper.ImGui_SetCursorPosY(ctx, cur_y + next_region_offset) -- offset to second line
-            draw_centered_text(ctx, nextreg, second_font_index, second_font_scale, second_text_color, second_shadow_color, win_w) -- second line
+            draw_centered_text(ctx, nextreg, second_font, second_font_scale, second_text_color, second_shadow_color, win_w) -- second line
         end
 
 
