@@ -1,11 +1,8 @@
 -- @description Prompter
 -- @author Chirick
--- @version 26.10.28
+-- @version 26.10.29
 -- @changelog
---   + Font selection from fonts installed in the system (scanned once at startup)
---   + Font filter in font selection combo
---   + Fonts are saved by name instead of index
---   + Fixed time column width not recalculated after reloading subtitles longer than 1 hour
+--   + Search ignores stress marks (e.g. "mark" finds "Márker")
 -- @link https://github.com/chirick86/reaperscripts
 -- @donation https://patreon.com/chirick
 -- @about
@@ -28,6 +25,7 @@
 --[[TODO:
 -- add config script for Subtitle Scripts and config button in the main toolbar
 -- add options to config for Subtitle Scripts behavior
+-- add editing mode
 -- Behavior ideas:
 -- - Autocolor regions/tracks based on ass roles or track color
 -- - Split items tracks based on ass roles
@@ -732,9 +730,8 @@ end
 
 
 -- 🔧 Low-level utilities
-local function utf8lower(str)
-    -- Correct lowercase conversion (Russian/Latin)
-    local map = {
+-- Correct lowercase conversion (Russian/Latin)
+local utf8lower_map = {
         -- Russian
         ["А"]="а",["Б"]="б",["В"]="в",["Г"]="г",["Д"]="д",["Е"]="е",["Ё"]="е",
         ["Ж"]="ж",["З"]="з",["И"]="и",["Й"]="й",["К"]="к",["Л"]="л",["М"]="м",
@@ -750,10 +747,43 @@ local function utf8lower(str)
         ["Ї"]="ї",
         ["Є"]="є",
         ["Ґ"]="ґ",
-    }
+
+        -- stress marks are ignored in search
+        ["\204\129"]="",  -- U+0301 combining acute accent
+        ["\204\128"]="",  -- U+0300 combining grave accent
+}
+
+local function utf8lower(str)
+    local map = utf8lower_map
     return (tostring(str or ""):gsub("[%z\1-\127\194-\244][\128-\191]*", function(c)
         return map[c] or c:lower()
     end))
+end
+
+local function is_stress_mark(c)
+    return c == "\204\129" or c == "\204\128"
+end
+
+local function utf8find(text, query_lower)
+    -- Finds query_lower (already utf8lower'ed) in text, ignoring case and stress marks.
+    -- Returns byte positions of the match in the ORIGINAL text (or nil)
+    if query_lower == "" then return nil end
+    local parts, starts, ends = {}, {}, {}
+    local n = 0
+    for p, c in tostring(text or ""):gmatch("()([%z\1-\127\194-\244][\128-\191]*)") do
+        local lc = utf8lower(c)
+        for _ = 1, #lc do
+            n = n + 1
+            starts[n], ends[n] = p, p + #c - 1
+        end
+        parts[#parts+1] = lc
+    end
+    local s, e = table.concat(parts):find(query_lower, 1, true)
+    if not s then return nil end
+    s, e = starts[s], ends[e]
+    -- include stress marks right after the match (so the accent is highlighted with its letter)
+    while is_stress_mark(text:sub(e + 1, e + 2)) do e = e + 2 end
+    return s, e
 end
 
 local function format_time(sec)
@@ -1424,11 +1454,7 @@ local function draw_search_highlight(text, search_query, text_col_w)
         reaper.ImGui_SetCursorPos(ctx, start_x, y_pos)
         
         -- Search for matches in the line
-        local name_lower = utf8lower(line)
-        local s_pos, e_pos = nil, nil
-        if query_lower ~= "" then
-            s_pos, e_pos = name_lower:find(query_lower, 1, true)
-        end
+        local s_pos, e_pos = utf8find(line, query_lower)
         
         if s_pos then
             -- Found - split into 3 parts
