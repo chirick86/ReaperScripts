@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="chirick" commit="d4321913f55c4b4c10560225df124e25ef417118">
+<index version="1" name="chirick" commit="e394984561d8e8885c6ea4eb80d957bccb8c4472">
   <category name="ReaImGui">
     <reapack name="ch_prompter.lua" type="script" desc="Prompter">
       <metadata>
@@ -45,6 +45,10 @@
 + Fonts are saved by name instead of index
 + Fixed time column width not recalculated after reloading subtitles longer than 1 hour]]></changelog>
         <source main="main">https://github.com/chirick86/ReaperScripts/raw/d4321913f55c4b4c10560225df124e25ef417118/ReaImGui/ch_prompter.lua</source>
+      </version>
+      <version name="26.10.29" author="Chirick" time="2026-10-29T10:08:26Z">
+        <changelog><![CDATA[+ Search ignores stress marks (e.g. "mark" finds "Márker")]]></changelog>
+        <source main="main">https://github.com/chirick86/ReaperScripts/raw/e394984561d8e8885c6ea4eb80d957bccb8c4472/ReaImGui/ch_prompter.lua</source>
       </version>
     </reapack>
     <reapack name="ch_SubOverlay.lua" type="script" desc="SubOverlay">
